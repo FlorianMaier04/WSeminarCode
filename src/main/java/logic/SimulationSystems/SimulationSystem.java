@@ -1,7 +1,7 @@
 package logic.SimulationSystems;
 
 import logic.PhysicThread;
-import logic.objects.PhysicObject;
+import logic.objects.PhysikObjekt;
 import org.lwjgl.util.vector.Vector3f;
 
 
@@ -34,5 +34,7 @@ public interface SimulationSystem {
 
     public void initPhysicThread(PhysicThread pt);
 
-    public PhysicObject getEarth();
+    public PhysikObjekt getEarth();
+
+    Vector3f getTargetCameraRotation();
 }

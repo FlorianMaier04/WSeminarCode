@@ -2,7 +2,7 @@ package rendering.input;
 
 import logic.PhysicThread;
 import logic.PhysicsEngine;
-import logic.objects.PhysicObject;
+import logic.objects.PhysikObjekt;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -165,7 +165,7 @@ public class InputFrame extends JFrame {
     private void initPlanets() {
         int marsIndex = -1;
         int index = 0;
-        for(PhysicObject o: PhysicsEngine.physicObjects) {
+        for(PhysikObjekt o: PhysicsEngine.physikObjekts) {
             planetDropdown.addItem(o.name);
             if(o.name.equals("mars"))
                 planetDropdown.setSelectedItem(o.name);

@@ -2,7 +2,7 @@ package logic;
 
 import logic.SimulationSystems.RealisticSunSystem;
 import logic.SimulationSystems.SimulationSystem;
-import logic.objects.PhysicObject;
+import logic.objects.PhysikObjekt;
 import rendering.Scene;
 import rendering.input.InputFrame;
 import tools.FeedbackBuilder;
@@ -36,7 +36,7 @@ public class PhysicThread extends Thread {
     private void initContent() {
         activeSystem.initPhysicThread(this);
         PhysicsEngine.setSecondsPerFrame(activeSystem.getSecondsPerFrame());
-        PhysicObject.displayVector = activeSystem.displayVectors();
+        PhysikObjekt.displayVector = activeSystem.displayVectors();
         activeSystem.initContent();
     }
 

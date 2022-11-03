@@ -1,13 +1,10 @@
 package logic;
 
-import logic.objects.PhysicObject;
-import tools.Keyboard;
+import logic.objects.PhysikObjekt;
 import tools.dataStructures.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_G;
 
 public class PhysicsEngine extends Thread {
 
@@ -18,6 +15,7 @@ public class PhysicsEngine extends Thread {
     public static final long startTimeSeconds = 953534056 + secondsPerYear * 1970;
     public static final double startTimeDays = 895455583.3805;
     public static final double secondsPerDay =  86400;
+    public static final double secondsPerHour = Math.pow(60.0, 2.0);
 
     /**
      * the amount of time that passes in 1 frame
@@ -35,7 +33,7 @@ public class PhysicsEngine extends Thread {
     public static double convertSY(double time) { return time / secondsPerYear; }
 
     //contains all objects to be computed by the physicsEngine
-    public static List<PhysicObject> physicObjects = new ArrayList<>();
+    public static List<PhysikObjekt> physikObjekts = new ArrayList<>();
 
 
     /**
@@ -64,9 +62,8 @@ public class PhysicsEngine extends Thread {
 
 
     public static void update() {
-        for (PhysicObject o : physicObjects) {
-            o.update(physicObjects);
-            o.computePlanetYear();
+        for (PhysikObjekt o : physikObjekts) {
+            o.update(physikObjekts);
         }
         updateTime();
     }
@@ -76,8 +73,8 @@ public class PhysicsEngine extends Thread {
     }
 
 
-    public static void addPhysicsObject(PhysicObject physicObject) {
-        physicObjects.add(physicObject);
+    public static void addPhysicsObject(PhysikObjekt physikObjekt) {
+        physikObjekts.add(physikObjekt);
     }
 
     public static void setSecondsPerFrame(double value) {

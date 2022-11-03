@@ -2,7 +2,7 @@ package tools;
 
 import logic.PhysicThread;
 import logic.PhysicsEngine;
-import logic.objects.PhysicObject;
+import logic.objects.PhysikObjekt;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,8 +13,6 @@ import java.io.FileWriter;
  */
 public class FeedbackBuilder {
 
-    public static final int LETZTE_UMLAUFZEIT = 0;
-    public static final int DURCHSCHNITTLICHE_UMLAUFZEIT = 1;
     public static final int POSITION = 2;
     public static final int SPEED = 3;
     public static final int ACCELLERATION = 4;
@@ -39,8 +37,9 @@ public class FeedbackBuilder {
     private void build() {
         String[] debuggedPlanets = PhysicThread.activeSystem.getDebuggedPlanets();
         boolean printOut = PhysicThread.writtenPlanet == null;
+        printOut = false;
         String build = "";
-        for (PhysicObject po : PhysicsEngine.physicObjects) {
+        for (PhysikObjekt po : PhysicsEngine.physikObjekts) {
             if(po.name.equals(PhysicThread.writtenPlanet)) {
                 if(lastWrittenTime == 0)
                     lastWrittenTime = PhysicsEngine.timePassed;
@@ -65,7 +64,7 @@ public class FeedbackBuilder {
             }
         }
         if(printOut)
-            System.out.println(printOut);
+            System.out.println(build);
 
     }
 
@@ -74,7 +73,7 @@ public class FeedbackBuilder {
 
     private final String newLine = System.lineSeparator();
 
-    private void writeFileData(PhysicObject po) {
+    private void writeFileData(PhysikObjekt po) {
         switch(PhysicThread.writeMode) {
             case DISTANCE_TO_EARTH:
                 double distance = po.pos.sub(PhysicThread.activeSystem.getEarth().pos).length() / PhysicsEngine.meterPerAE;
@@ -104,17 +103,11 @@ public class FeedbackBuilder {
     private final char objectSeparator = '|';
 
 
-    private String addObject(PhysicObject po, String build) {
+    private String addObject(PhysikObjekt po, String build) {
         build += " " + objectSeparator + po.name + ": ";
         int[] debuggedValues = PhysicThread.activeSystem.getDebuggedValues();
         for (int valueId : debuggedValues) {
             switch (valueId) {
-                case LETZTE_UMLAUFZEIT:
-                    build = addValue(build, PhysicsEngine.convertSD(po.getRecentOrbitalPeriod()), 0);
-                    break;
-                case DURCHSCHNITTLICHE_UMLAUFZEIT:
-                    build = addValue(build, PhysicsEngine.convertSD(po.getAverageOrbitalPeriod()), 1);
-                    break;
                 case POSITION:
                     build = addValue(build, po.pos.toString(), 2);
                 case SPEED:

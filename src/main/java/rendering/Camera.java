@@ -93,4 +93,7 @@ public class Camera {
         this.position = pos;
     }
 
+    public void setRotation(Vector3f rot) {
+        this.rotation = rot;
+    }
 }

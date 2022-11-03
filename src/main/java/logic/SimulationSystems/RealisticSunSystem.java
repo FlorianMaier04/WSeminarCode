@@ -3,7 +3,7 @@ package logic.SimulationSystems;
 import logic.PhysicThread;
 import logic.PhysicsEngine;
 import logic.objects.EquatorialCoordinateSystem;
-import logic.objects.PhysicObject;
+import logic.objects.PhysikObjekt;
 import logic.objects.vectors.RenderedVector;
 import logic.objects.vectors.VectorHandler;
 import org.lwjgl.glfw.GLFW;
@@ -20,15 +20,15 @@ public class RealisticSunSystem implements SimulationSystem {
     private int currentUpdatesPerPrint = updatesPerPrint;
     private final double secondsPerFrame = 8000 / 50;
 
-    private PhysicObject sonne;
-    private PhysicObject erde;
-    private PhysicObject mars;
-    private PhysicObject saturn;
-    private PhysicObject jupiter;
-    private PhysicObject venus;
-    private PhysicObject merkur;
-    private PhysicObject uranus;
-    private PhysicObject neptun;
+    private PhysikObjekt sonne;
+    private PhysikObjekt erde;
+    private PhysikObjekt mars;
+    private PhysikObjekt saturn;
+    private PhysikObjekt jupiter;
+    private PhysikObjekt venus;
+    private PhysikObjekt merkur;
+    private PhysikObjekt uranus;
+    private PhysikObjekt neptun;
 
     public boolean displayVectors = false;
 
@@ -45,14 +45,19 @@ public class RealisticSunSystem implements SimulationSystem {
         //Datum: 20.3.2000 7:34:16
         //JD: 2451623,77380
         //Erde
-        erde = new PhysicObject(aeToM(0.99595), 0, 0);
-        erde.initPhysics(0, 29915, 0, 5.9742 * Math.pow(10, 24));
+        double d0 = aeToM(0.99595);
+        double d1 = aeToM(0.99596);
+        double dt = PhysicsEngine.secondsPerHour;
+        double betragV = 29915;
+        erde = new PhysikObjekt(d0, 0, 0);
+        erde.mass = 5.9742 * Math.pow(10, 24);
         erde.fixedColor = new Vector3f(0, 191, 255);
         erde.scale = 2f * scaleFactor;
+        erde.berechneGeschwindigkeit(d0, d1, dt, betragV);
         erde.name = "erde";
 
         //Sonne
-        sonne = new PhysicObject(0, 0, 0);
+        sonne = new PhysikObjekt(0, 0, 0);
         sonne.initPhysics(0, 0, 0, 1.9891 * Math.pow(10, 30));
         sonne.fixedColor = new Vector3f(5250, 5250, 5250);
         sonne.name = "sonne";
@@ -60,17 +65,17 @@ public class RealisticSunSystem implements SimulationSystem {
 
         if(PhysicThread.windowStart || true) {
             addMars();
+            addVenus();
             addSaturn();
             addJupiter();
-            addVenus();
             addMerkur();
             addUranus();
             addNeptun();
         }
 
         //3d Koordinatensystem
-        VectorHandler.addVector(new RenderedVector(new Vector3f(0,0,0), new Vector3f(0,1,0), 1000));
-        VectorHandler.addVector(new RenderedVector(new Vector3f(0,0,0), new Vector3f(1,0,0), 1000).withColor(0,1,0));
+        VectorHandler.addVector(new RenderedVector(new Vector3f(0,0,0), new Vector3f(1,0,0), 1000).withColor(1,0,0));
+        VectorHandler.addVector(new RenderedVector(new Vector3f(0,0,0), new Vector3f(0,1,0), 1000).withColor(0,1,0));
         VectorHandler.addVector(new RenderedVector(new Vector3f(0,0,0), new Vector3f(0,0,1), 1000).withColor(0,0,1));
     }
 
@@ -146,9 +151,9 @@ public class RealisticSunSystem implements SimulationSystem {
 
     private final double massSizeFactor = 5 * Math.pow(10, -4);
 
-    private PhysicObject createPlanet(EquatorialCoordinateSystem.EquatorialCoordinate coordinate, double mass, double speed, Vector3f color, String name, double radius) {
-        PhysicObject result;
-        result = PhysicObject.createObjectWithEquatorialCoordinates(coordinate, erde, sonne);
+    private PhysikObjekt createPlanet(EquatorialCoordinateSystem.EquatorialCoordinate coordinate, double mass, double speed, Vector3f color, String name, double radius) {
+        PhysikObjekt result;
+        result = PhysikObjekt.initialisiereObjektMitAequatorkoordinate(coordinate, erde, sonne);
         result.initPhysics(speed, mass, sonne);
         result.fixedColor = color;
         result.name = name;
@@ -157,9 +162,11 @@ public class RealisticSunSystem implements SimulationSystem {
     }
 
     private double computeDegree(int degree, int minutes, double seconds) {
-        double sum = minutes * 60 + seconds;
+        int degreeVorzeichen = degree / Math.abs(degree);
+
+        double sum = minutes * 60 * degreeVorzeichen + seconds * degreeVorzeichen;
         double totalSeconds = 60 * 60;
-        return degree + sum / totalSeconds;
+        return Math.abs(degree + sum / totalSeconds);
     }
 
     private final double meterPerAe = 1.495979 * Math.pow(10, 11);
@@ -184,13 +191,14 @@ public class RealisticSunSystem implements SimulationSystem {
 //        if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_H))
 //            earth.speed = new Vector3d(earth.speed.x,earth.speed.y + 100,earth.speed.z);
 
+
         if (lastEarthY < 0 && erde.pos.y > 0) {
             double diff = ((1.48950 * Math.pow(10, 11)) - erde.pos.x);
             double timePassed = PhysicsEngine.timePassed;
             double yearTime = timePassed - lastYearTime;
             lastYearTime = PhysicsEngine.timePassed;
+            System.out.println("year: " + PhysicsEngine.timePassedYears());
 //            System.out.println("year: " + yearCounter + "yearTime: " + (yearTime / (60 * 60 * 24 * 365.25)));
-//            System.out.println("sunPos: " + sun.pos);
             lastDiff = diff;
             yearCounter++;
         }
@@ -228,7 +236,7 @@ public class RealisticSunSystem implements SimulationSystem {
     }
 
     @Override
-    public PhysicObject getEarth() {
+    public PhysikObjekt getEarth() {
         return erde;
     }
 
@@ -254,6 +262,14 @@ public class RealisticSunSystem implements SimulationSystem {
 
     @Override
     public Vector3f getTargetCameraPosition() {
-        return new Vector3f(0,0,1000);
+        return new Vector3f(400,0,0);
+//        return new Vector3f(0, 0,1000);
     }
+
+    @Override
+    public Vector3f getTargetCameraRotation() {
+        return new Vector3f(0,280,0);
+//        return new Vector3f(0,0,0);
+    }
+
 }

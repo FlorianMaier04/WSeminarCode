@@ -1,5 +1,7 @@
 package logic.objects;
 
+import tools.Maths;
+import tools.dataStructures.Matrix3d;
 import tools.dataStructures.Vector3d;
 
 /**
@@ -13,7 +15,7 @@ public class EquatorialCoordinateSystem {
     /**
      * @param earth die Erde mit den Koordinaten des Frühlingspunktes
      */
-    public EquatorialCoordinateSystem(PhysicObject earth, PhysicObject sun) {
+    public EquatorialCoordinateSystem(PhysikObjekt earth, PhysikObjekt sun) {
         earthSunVector = sun.pos.sub(earth.pos).normalize();
 
 
@@ -35,7 +37,8 @@ public class EquatorialCoordinateSystem {
             // Umrechnung in Sekunden
             int secondsPerMinute = 60;
             int secondsPerHour = secondsPerMinute * 60;
-            double sum = rektaszension[0] * secondsPerHour + rektaszension[1] * secondsPerMinute + rektaszension[2];
+            int rektaszensionVorzeichen = (int) (rektaszension[0] / Math.abs(rektaszension[0])) ;
+            double sum = rektaszension[0] * secondsPerHour + rektaszension[1] * secondsPerMinute * rektaszensionVorzeichen + rektaszension[2] * rektaszensionVorzeichen;
             int total = 24 * secondsPerHour;
             computedRektaszension = sum / (double) total;
             computedDeclination = (declination) / 180;
@@ -46,17 +49,18 @@ public class EquatorialCoordinateSystem {
         }
 
         public Vector3d computeCoordinatePosition(EquatorialCoordinateSystem system) {
-            Vector3d rotatedVector = new Vector3d(Math.sin(computedRektaszension * 2 * Math.PI),Math.sin(computedDeclination * 2 * Math.PI),0);
-            Vector3d normalizedVector;
-            if(rotatedVector.length() == 0)
-                normalizedVector = rotatedVector;
-            else
+            // Nordpol der Erde zeigt z-Achse -> Deklination ist z Position
+            double declinationAngle = (computedDeclination) * 2.0 * Math.PI;
+            double rektaszensionAngle = computedRektaszension * 2 * Math.PI;
 
-                normalizedVector = rotatedVector.normalize();
-            Vector3d systemVector = system.earthSunVector.add(normalizedVector);
-            System.out.println("normalized Vector: " + normalizedVector + " system: "+systemVector + " declination: "+computedDeclination);
-            System.out.println("scale: "+distance);
-            return systemVector.normalize().scale(distance);
+            Matrix3d rotationMatrixZ = Maths.createRotationMatrixZ(rektaszensionAngle);
+            Matrix3d rotationMatrixY = Maths.createRotationMatrixX(declinationAngle);
+
+
+            Vector3d rotatedVector = rotationMatrixZ.multiply(system.earthSunVector);
+            rotatedVector = rotationMatrixY.multiply(rotatedVector);
+
+            return rotatedVector.scale(distance);
         }
     }
 

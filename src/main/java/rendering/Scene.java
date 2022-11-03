@@ -2,8 +2,7 @@ package rendering;
 
 import logic.PhysicThread;
 import logic.PhysicsEngine;
-import logic.SimulationSystems.SimulationSystem;
-import logic.objects.PhysicObject;
+import logic.objects.PhysikObjekt;
 import logic.objects.RenderObject;
 import logic.objects.vectors.RenderedVector;
 import logic.objects.vectors.VectorHandler;
@@ -20,8 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13C.glActiveTexture;
 
 public class Scene {
 
@@ -44,6 +41,7 @@ public class Scene {
         pm = Maths.createProjectionMatrix();
         camera = new Camera();
         camera.setPosition(PhysicThread.activeSystem.getTargetCameraPosition());
+        camera.setRotation(PhysicThread.activeSystem.getTargetCameraRotation());
         init();
         camera.init();
     }
@@ -80,11 +78,11 @@ public class Scene {
 
 
     private void loadPhysicsData() {
-        for (int i = 0; i < PhysicsEngine.physicObjects.size(); i++) {
+        for (int i = 0; i < PhysicsEngine.physikObjekts.size(); i++) {
             RenderObject o = null;
             boolean objectPresent = i < objects.size();
             if (objectPresent) o = objects.get(i);
-            RenderObject newObject = convertPhysicToRenderObject(PhysicsEngine.physicObjects.get(i), o);
+            RenderObject newObject = convertPhysicToRenderObject(PhysicsEngine.physikObjekts.get(i), o);
             if (objectPresent) objects.set(i, newObject);
             else objects.add(newObject);
         }
@@ -93,7 +91,7 @@ public class Scene {
     private static double maxMass = 0;
 
 
-    private RenderObject convertPhysicToRenderObject(PhysicObject po, RenderObject ro) {
+    private RenderObject convertPhysicToRenderObject(PhysikObjekt po, RenderObject ro) {
         if (maxMass < po.mass) maxMass = po.mass;
         RenderObject object = ro;
         if (object == null) {

@@ -71,4 +71,16 @@ public class Vector3d {
         basePart = basePart.substring(0,Math.min(decimals + 1,basePart.length()));
         return basePart + ePart;
     }
+
+    public Vector3d rotateXY(double angle) {
+        double newX = x * Math.cos(angle) - y * Math.sin(angle);
+        double newY = x * Math.sin(angle) + y * Math.cos(angle);
+        return new Vector3d(newX, newY, z);
+    }
+
+    public Vector3d rotateYZ(double angle) {
+        double newY = y * Math.cos(angle) - z * Math.sin(angle);
+        double newZ = y * Math.sin(angle) + z * Math.cos(angle);
+        return new Vector3d(x, newY, newZ);
+    }
 }
