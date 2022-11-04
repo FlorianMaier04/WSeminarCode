@@ -12,7 +12,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Window {
 
-    public static final int width = 1920, height = 1080 / 2;
+    public static final int width = 1920, height = 1080;
     String title;
 
     private static Window window = null;

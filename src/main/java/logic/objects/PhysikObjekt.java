@@ -6,6 +6,8 @@ import logic.objects.vectors.RenderedVector;
 import logic.objects.vectors.VectorHandler;
 import org.lwjgl.util.vector.Vector3f;
 import rendering.Scene;
+import tools.Maths;
+import tools.dataStructures.Matrix3d;
 import tools.dataStructures.Vector3d;
 
 import java.util.List;
@@ -139,9 +141,12 @@ public class PhysikObjekt {
         setSpeed(v1, v2, v3);
     }
 
-    public void initPhysics(double speedAmount, double mass, @org.jetbrains.annotations.NotNull PhysikObjekt sun) {
+    public void initPhysics(double speedAmount, double mass, @org.jetbrains.annotations.NotNull PhysikObjekt sun, double ekliptikWinkelGrad) {
         Vector3d sunVector = pos.sub(sun.pos);
-        // alles spielt sich in der x1, x2 Ebene ab
+
+        double ekliptikWinkel = (ekliptikWinkelGrad / 360) * 2 * Math.PI;
+        Matrix3d rotationMatrixX = Maths.createRotationMatrixX(ekliptikWinkel);
+
         double x3 = 0;
         double x2 = speedAmount / Math.sqrt((Math.pow(sunVector.y,2)/Math.pow(sunVector.x,2)+1));
         double x1 = -(sunVector.y * x2) / sunVector.x;

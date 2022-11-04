@@ -16,8 +16,6 @@ import static tools.FeedbackBuilder.*;
 public class RealisticSunSystem implements SimulationSystem {
 
     int printCounter = 0;
-    private final int updatesPerPrint = 800000;
-    private int currentUpdatesPerPrint = updatesPerPrint;
     private final double secondsPerFrame = 8000 / 50;
 
     private PhysikObjekt sonne;
@@ -34,7 +32,9 @@ public class RealisticSunSystem implements SimulationSystem {
 
     private PhysicThread pt;
 
-    private final float scaleFactor = 8f;
+    private final float scaleFactor = 5f;
+
+    boolean standardBegin = false;
 
     private final String[] debuggedPlanets = new String[] {"sonne"};
     private final int[] debuggedValues = new int[] {ACCELLERATION,
@@ -43,7 +43,7 @@ public class RealisticSunSystem implements SimulationSystem {
     @Override
     public void initContent() {
         //Datum: 20.3.2000 7:34:16
-        //JD: 2451623,77380
+        //JD: 2451623,77380ss
         //Erde
         double d0 = aeToM(0.99595);
         double d1 = aeToM(0.99596);
@@ -86,7 +86,7 @@ public class RealisticSunSystem implements SimulationSystem {
         coordinate = new EquatorialCoordinateSystem.EquatorialCoordinate(rektaszension, declination);
         coordinate.withDistance(aeToM(0.45153));
         merkur = createPlanet(coordinate, 3.285 * Math.pow(10, 23), -40466,
-                new Vector3f(248, 248, 248),"merkur", 15329);
+                new Vector3f(248, 248, 248),"merkur", 15329,7.0);
     }
 
     private void addVenus() {
@@ -96,7 +96,7 @@ public class RealisticSunSystem implements SimulationSystem {
         coordinate = new EquatorialCoordinateSystem.EquatorialCoordinate(rektaszension, declination);
         coordinate.withDistance(aeToM(0.72825));
         venus = createPlanet(coordinate, 4.867 * Math.pow(10, 24), -34785,
-                new Vector3f(248, 243, 43), "venus",38025);
+                new Vector3f(248, 243, 43), "venus",38025,3.4);
     }
 
     private void addMars() {
@@ -106,7 +106,7 @@ public class RealisticSunSystem implements SimulationSystem {
         coordinate = new EquatorialCoordinateSystem.EquatorialCoordinate(rektaszension, declination);
         coordinate.withDistance(aeToM(1.46465d));
         mars = createPlanet(coordinate, 6.417 * Math.pow(10, 23), -25082,
-                new Vector3f(204, 102, 0), "mars", 21344);
+                new Vector3f(204, 102, 0), "mars", 21344,1.9);
     }
 
     private void addSaturn() {
@@ -116,7 +116,7 @@ public class RealisticSunSystem implements SimulationSystem {
         coordinate = new EquatorialCoordinateSystem.EquatorialCoordinate(rektaszension, declination);
         coordinate.withDistance(aeToM(9.85299d));
         saturn = createPlanet(coordinate, 5.683 * Math.pow(10, 26), -10049,
-                new Vector3f(204,153,51), "saturn", 378675);
+                new Vector3f(204,153,51), "saturn", 378675,2.5);
     }
 
     private void addJupiter() {
@@ -126,7 +126,7 @@ public class RealisticSunSystem implements SimulationSystem {
         coordinate = new EquatorialCoordinateSystem.EquatorialCoordinate(rektaszension, declination);
         coordinate.withDistance(aeToM(4.97700));
         jupiter = createPlanet(coordinate, 1.898 * Math.pow(10, 27), -13645,
-                new Vector3f(250,225,167), "jupiter", 439264);
+                new Vector3f(250,225,167), "jupiter", 439264,1.3);
     }
 
     private void addUranus() {
@@ -136,7 +136,7 @@ public class RealisticSunSystem implements SimulationSystem {
         coordinate = new EquatorialCoordinateSystem.EquatorialCoordinate(rektaszension, declination);
         coordinate.withDistance(aeToM(19.93296));
         uranus = createPlanet(coordinate, 8.681 * Math.pow(10, 25), -6547,
-                new Vector3f(85, 217, 238),"uranus", 160590);
+                new Vector3f(85, 217, 238),"uranus", 160590,0.8);
     }
 
     private void addNeptun() {
@@ -146,15 +146,16 @@ public class RealisticSunSystem implements SimulationSystem {
         coordinate = new EquatorialCoordinateSystem.EquatorialCoordinate(rektaszension, declination);
         coordinate.withDistance(aeToM(30.12019));
         neptun = createPlanet(coordinate, 1.024 * Math.pow(10, 26), -5425,
-                new Vector3f(49, 65, 248),"neptun", 155600);
+                new Vector3f(49, 65, 248),"neptun", 155600,1.8);
     }
 
     private final double massSizeFactor = 5 * Math.pow(10, -4);
 
-    private PhysikObjekt createPlanet(EquatorialCoordinateSystem.EquatorialCoordinate coordinate, double mass, double speed, Vector3f color, String name, double radius) {
+    private PhysikObjekt createPlanet(EquatorialCoordinateSystem.EquatorialCoordinate coordinate, double mass,
+                                      double speed, Vector3f color, String name, double radius, double ekliptikWinkelGrad) {
         PhysikObjekt result;
         result = PhysikObjekt.initialisiereObjektMitAequatorkoordinate(coordinate, erde, sonne);
-        result.initPhysics(speed, mass, sonne);
+        result.initPhysics(speed, mass, sonne, ekliptikWinkelGrad);
         result.fixedColor = color;
         result.name = name;
         result.scale = (float)(radius * massSizeFactor);
@@ -188,46 +189,6 @@ public class RealisticSunSystem implements SimulationSystem {
 
     @Override
     public void update() {
-//        if(Keyboard.isKeyPressed(GLFW.GLFW_KEY_H))
-//            earth.speed = new Vector3d(earth.speed.x,earth.speed.y + 100,earth.speed.z);
-
-
-        if (lastEarthY < 0 && erde.pos.y > 0) {
-            double diff = ((1.48950 * Math.pow(10, 11)) - erde.pos.x);
-            double timePassed = PhysicsEngine.timePassed;
-            double yearTime = timePassed - lastYearTime;
-            lastYearTime = PhysicsEngine.timePassed;
-            System.out.println("year: " + PhysicsEngine.timePassedYears());
-//            System.out.println("year: " + yearCounter + "yearTime: " + (yearTime / (60 * 60 * 24 * 365.25)));
-            lastDiff = diff;
-            yearCounter++;
-        }
-
-        lastEarthY = erde.pos.y;
-
-        if (printCounter == currentUpdatesPerPrint) {
-            currentUpdatesPerPrint = updatesPerPrint;
-            double pre = PhysicsEngine.secondsPerFrame;
-            if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_H)) {
-                PhysicsEngine.secondsPerFrame = PhysicsEngine.secondsPerFrame - Math.pow(10, 1);
-            } else if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_J)) {
-                PhysicsEngine.secondsPerFrame = PhysicsEngine.secondsPerFrame + Math.pow(10, 1);
-            }
-            if (PhysicsEngine.secondsPerFrame == 0 || PhysicsEngine.secondsPerFrame < 0) {
-                PhysicsEngine.secondsPerFrame = 0.1;
-            }
-            if (PhysicsEngine.secondsPerFrame != pre) {
-                System.err.println();
-                System.err.println("secondsPerFrame: " + PhysicsEngine.secondsPerFrame);
-                System.err.println();
-            }
-            if (Keyboard.isKeyPressed(GLFW.GLFW_KEY_B)) {
-                Scene.render = !Scene.render;
-                currentUpdatesPerPrint = 200000 * 5;
-            }
-            printCounter = 0;
-        }
-        printCounter++;
     }
 
     @Override
@@ -262,14 +223,16 @@ public class RealisticSunSystem implements SimulationSystem {
 
     @Override
     public Vector3f getTargetCameraPosition() {
+        if(standardBegin)
+            return new Vector3f(0, 0,1000);
         return new Vector3f(400,0,0);
-//        return new Vector3f(0, 0,1000);
     }
 
     @Override
     public Vector3f getTargetCameraRotation() {
+        if(standardBegin)
+            return new Vector3f(0,0,0);
         return new Vector3f(0,280,0);
-//        return new Vector3f(0,0,0);
     }
 
 }
