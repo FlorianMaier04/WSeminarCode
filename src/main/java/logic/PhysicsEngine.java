@@ -11,7 +11,9 @@ public class PhysicsEngine extends Thread {
     //constant values
     public static final double G = 6.67384 * Math.pow(10, -11.0);
     public static final double meterPerAE = 1.496 * Math.pow(10, 11);
-    public static final long secondsPerYear = 31536000;
+//    public static final long secondsPerYear = 31536000;
+    public static final long secondsPerYear = Math.round(60 * 60 * 24 * 365.25);
+
     public static final long startTimeSeconds = 953534056 + secondsPerYear * 1970;
     public static final double startTimeDays = 895455583.3805;
     public static final double secondsPerDay =  86400;
@@ -33,19 +35,7 @@ public class PhysicsEngine extends Thread {
     public static double convertSY(double time) { return time / secondsPerYear; }
 
     //contains all objects to be computed by the physicsEngine
-    public static List<PhysikObjekt> physikObjekts = new ArrayList<>();
-
-
-    /**
-     * @param m1 mass of object 1
-     * @param m2 mass of object 2
-     * @param r  radius between both objects in physics(-rendered) space
-     * @return the Gravitation-Force between both objects in double
-     */
-    public static double getGForce(double m1, double m2, double r) {
-        double force = G * m1 * m2 * (1 / Math.pow(r, 2));
-        return force;
-    }
+    public static List<PhysikObjekt> physikObjekte = new ArrayList<>();
 
 
     public static double getKineticEnergy(double m, Vector3d speed) {
@@ -62,8 +52,8 @@ public class PhysicsEngine extends Thread {
 
 
     public static void update() {
-        for (PhysikObjekt o : physikObjekts) {
-            o.update(physikObjekts);
+        for (PhysikObjekt o : physikObjekte) {
+            o.update(physikObjekte);
         }
         updateTime();
     }
@@ -74,7 +64,7 @@ public class PhysicsEngine extends Thread {
 
 
     public static void addPhysicsObject(PhysikObjekt physikObjekt) {
-        physikObjekts.add(physikObjekt);
+        physikObjekte.add(physikObjekt);
     }
 
     public static void setSecondsPerFrame(double value) {

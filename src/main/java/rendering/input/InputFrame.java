@@ -165,7 +165,7 @@ public class InputFrame extends JFrame {
     private void initPlanets() {
         int marsIndex = -1;
         int index = 0;
-        for(PhysikObjekt o: PhysicsEngine.physikObjekts) {
+        for(PhysikObjekt o: PhysicsEngine.physikObjekte) {
             planetDropdown.addItem(o.name);
             if(o.name.equals("mars"))
                 planetDropdown.setSelectedItem(o.name);

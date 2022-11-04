@@ -15,8 +15,11 @@ public class FeedbackBuilder {
 
     public static final int POSITION = 2;
     public static final int SPEED = 3;
-    public static final int ACCELLERATION = 4;
     public static final int DISTANCE_TO_EARTH = 5;
+    public static final int X_COORDINATE = 6;
+    public static final int Y_COORDINATE = 7;
+    public static final int Z_COORDINATE = 8;
+
     private static final String[] valueDescriptions = new String[]{"rec. Umlauf", "av. Umlauf", "pos", "v", "a"};
 
     private final int ticksPerBuild = 1;
@@ -39,7 +42,7 @@ public class FeedbackBuilder {
         boolean printOut = PhysicThread.writtenPlanet == null;
         printOut = false;
         String build = "";
-        for (PhysikObjekt po : PhysicsEngine.physikObjekts) {
+        for (PhysikObjekt po : PhysicsEngine.physikObjekte) {
             if(po.name.equals(PhysicThread.writtenPlanet)) {
                 if(lastWrittenTime == 0)
                     lastWrittenTime = PhysicsEngine.timePassed;
@@ -80,6 +83,24 @@ public class FeedbackBuilder {
                 xLine += PhysicsEngine.timePassedRealYears() + ",";
                 yLine += distance + ",";
                 break;
+            case Y_COORDINATE:
+                double y = po.pos.y / PhysicsEngine.meterPerAE;
+                y = Math.abs(y);
+                xLine += PhysicsEngine.timePassedRealYears() + ",";
+                yLine += y + ",";
+                break;
+            case X_COORDINATE:
+                double x = po.pos.x / PhysicsEngine.meterPerAE;
+                x = Math.abs(x);
+                xLine += PhysicsEngine.timePassedRealYears() + ",";
+                yLine += x + ",";                break;
+            case Z_COORDINATE:
+                double z = po.pos.z / PhysicsEngine.meterPerAE;
+                z = Math.abs(z);
+                xLine += PhysicsEngine.timePassedRealYears() + ",";
+                yLine += z + ",";
+                break;
+
         }
 
     }
@@ -112,8 +133,6 @@ public class FeedbackBuilder {
                     build = addValue(build, po.pos.toString(), 2);
                 case SPEED:
                     build = addValue(build, po.speed.toString(), 3);
-                case ACCELLERATION:
-                    build = addValue(build, po.acceleration.toString(), 4);
             }
         }
         return build;

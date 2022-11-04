@@ -19,7 +19,7 @@ public class PhysicThread extends Thread {
     public static String writtenPlanet = null;
     public static String writtenPlanetFileName = "";
     public static final String writtenPlanetFilePath = "GraphShower/res/";
-    public static int writeMode = FeedbackBuilder.DISTANCE_TO_EARTH;
+    public static int writeMode = FeedbackBuilder.X_COORDINATE;
     public static long secondsPerWrite = PhysicsEngine.secondsPerYear / (16 * 16);
 
     @Override
@@ -36,7 +36,7 @@ public class PhysicThread extends Thread {
 
     public boolean runPhysicsSimulation = false;
 
-    public static final boolean windowStart = true;
+    public static final boolean windowStart = false;
 
     @Override
     public void run() {

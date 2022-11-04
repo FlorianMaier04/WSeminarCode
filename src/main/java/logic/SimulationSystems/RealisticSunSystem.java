@@ -32,8 +32,7 @@ public class RealisticSunSystem implements SimulationSystem {
     boolean standardBegin = true;
 
     private final String[] debuggedPlanets = new String[] {"sonne"};
-    private final int[] debuggedValues = new int[] {ACCELLERATION,
-            SPEED, POSITION};
+    private final int[] debuggedValues = new int[] {SPEED, POSITION};
 
     // enthält jeweils den Planetennamen als Key und dann als Wert eine Array der Form [d1,d2,dt]
     private final HashMap<String, double[]> distanceMap = new HashMap();

@@ -1,11 +1,7 @@
 package logic.objects;
 
-import logic.PhysicThread;
 import logic.PhysicsEngine;
-import logic.objects.vectors.RenderedVector;
-import logic.objects.vectors.VectorHandler;
 import org.lwjgl.util.vector.Vector3f;
-import rendering.Scene;
 import tools.Maths;
 import tools.dataStructures.Matrix3d;
 import tools.dataStructures.Vector3d;
@@ -15,10 +11,8 @@ import java.util.List;
 public class PhysikObjekt {
 
     public Vector3d pos;
-    public Vector3f rotation = new Vector3f(0, 0, 0);
     public float scale;
 
-    public Vector3d acceleration = new Vector3d(0, 0, 0);
     public Vector3d speed = new Vector3d(0, 0, 0);
     public double mass = 0;
 
@@ -43,23 +37,24 @@ public class PhysikObjekt {
         PhysicsEngine.addPhysicsObject(this);
     }
 
-    public void update(List<PhysikObjekt> physikObjekts) {
-        //results from all forces added
-        Vector3d forceVector = new Vector3d(0, 0, 0);
-        //computing force
-        for (int i = 0; i < physikObjekts.size(); i++) {
-            PhysikObjekt o2 = physikObjekts.get(i);
-            if (o2 == this) continue;
+    public void update(List<PhysikObjekt> physikObjekte) {
 
-            Vector3d diffVector = o2.pos.sub(pos);
-            double r = diffVector.length();
-            float force = (float) PhysicsEngine.getGForce(o2.mass, mass, r);
-            forceVector = forceVector.add(diffVector.normalize().scale(force));
+        Vector3d f = new Vector3d(0, 0, 0);
+        for (int j = 0; j < physikObjekte.size(); j++) {
+            PhysikObjekt Oj = physikObjekte.get(j);
+            if (Oj == this) continue; // i != i
+
+            Vector3d diffVektor = Oj.pos.sub(pos);
+            double r = diffVektor.length();
+            double mi = mass, mj = Oj.mass;
+            double force = (PhysicsEngine.G * mi * mj) / Math.pow(r, 2);
+
+            f = f.add(diffVektor.normalize().scale(force));
         }
-        acceleration = forceVector.divide(mass);
+        Vector3d a = f.divide(mass);
 
         double timePassed = PhysicsEngine.secondsPerFrame;
-        speed = speed.add(acceleration.scale(timePassed));
+        speed = speed.add(a.scale(timePassed));
         pos = pos.add(speed.scale(timePassed));
     }
 
@@ -69,7 +64,8 @@ public class PhysikObjekt {
         double cosAlpha = (Math.pow(d1, 2) - Math.pow(d0, 2) - Math.pow(betragV * dt, 2)) / (-2 * d0 * betragV * dt);
 
         double v2 = betragV - betragV * cosAlpha;
-        double v1 = betragV * cosAlpha;
+        double v1 = -betragV * cosAlpha;
+
         setSpeed(v1, -v2, v3);
     }
 

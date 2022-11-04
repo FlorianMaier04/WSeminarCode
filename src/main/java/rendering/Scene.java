@@ -4,7 +4,6 @@ import logic.PhysicThread;
 import logic.PhysicsEngine;
 import logic.objects.PhysikObjekt;
 import logic.objects.RenderObject;
-import logic.objects.vectors.RenderedVector;
 import logic.objects.vectors.VectorHandler;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
@@ -12,10 +11,8 @@ import rendering.shaders.StandardShader;
 import tools.FeedbackBuilder;
 import tools.Maths;
 import tools.dataStructures.Vao;
-import tools.dataStructures.Vector3d;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -78,11 +75,11 @@ public class Scene {
 
 
     private void loadPhysicsData() {
-        for (int i = 0; i < PhysicsEngine.physikObjekts.size(); i++) {
+        for (int i = 0; i < PhysicsEngine.physikObjekte.size(); i++) {
             RenderObject o = null;
             boolean objectPresent = i < objects.size();
             if (objectPresent) o = objects.get(i);
-            RenderObject newObject = convertPhysicToRenderObject(PhysicsEngine.physikObjekts.get(i), o);
+            RenderObject newObject = convertPhysicToRenderObject(PhysicsEngine.physikObjekte.get(i), o);
             if (objectPresent) objects.set(i, newObject);
             else objects.add(newObject);
         }
@@ -97,7 +94,6 @@ public class Scene {
         if (object == null) {
             object = new RenderObject(0, 0, 0, 0, "sphere");
         }
-        object.rotation = new Vector3f(po.rotation);
         object.scale = po.scale;
         object.pos = po.pos.divide(metersPerRenderedDistance).convertToFloat();
         if (po.fixedColor != null) {
