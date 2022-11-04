@@ -106,8 +106,6 @@ public class Scene {
             float colorValue = (float) ((po.mass / maxMass));
             object.color = new Vector3f(0.25f + 0.75f * colorValue, 0.25f + 0.5f * colorValue, 0.4f);
         }
-        if (po.name != null && object.texture == null)
-            object.setTexture(po.name);
         return object;
     }
 
@@ -128,18 +126,7 @@ public class Scene {
     private void renderObject(RenderObject o) {
         Vao model = o.getModel();
         sShader.uTransformationMatrix.loadMatrix(Maths.createTransformationMatrix(o.pos, o.rotation, o.scale));
-        sShader.uBrightness.loadFloat(o.brightness);
         sShader.uColor.loadVec3(o.color);
-
-        //managing the texture
-        boolean useTexture = o.texture != null;
-        sShader.uUseTexture.loadBoolean(true);
-
-//        if (useTexture) {
-//            glActiveTexture(StandardShader.STANDARD_TEXTURE_UNIT);
-//            o.texture.bind();
-//            glActiveTexture(0);
-//        }
 
         //bind vao to use
         model.bind(0);
@@ -148,42 +135,4 @@ public class Scene {
         glDrawElements(GL_TRIANGLES, model.getIndexCount(), GL_UNSIGNED_INT, 0);
 
     }
-
-    private static HashMap<Integer, int[]> physicsVisualization = new HashMap<>();
-
-    public static void handleVector(Vector3d acceleration, Vector3d speed, Vector3d pos, boolean displayVector,
-                                    int visualizationId) {
-        Vector3d visualizedVector = pos.divide(metersPerRenderedDistance);
-        if (!physicsVisualization.containsKey(visualizationId))
-            physicsVisualization.put(visualizationId, new int[]{-1, -1});
-        int[] vectorHandles = physicsVisualization.get(visualizationId);
-        int vectorHandle1 = vectorHandles[0];
-        int vectorHandle2 = vectorHandles[1];
-        if (!displayVector) {
-            if (vectorHandle1 == -1) return;
-            VectorHandler.removeVector(vectorHandle1);
-            VectorHandler.removeVector(vectorHandle2);
-            vectorHandle1 = -1;
-            vectorHandle2 = -1;
-            return;
-        }
-        if (vectorHandle1 == -1) {
-            //create new Vector
-            RenderedVector v = new RenderedVector(visualizedVector, acceleration);
-            v.renderScale = Math.pow(10, 11);
-            v.color = new Vector3f(0, 0, 1);
-            vectorHandle1 = VectorHandler.addVector(v);
-            RenderedVector v2 = new RenderedVector(visualizedVector, speed);
-            v2.renderScale = Math.pow(10, 4);
-            v2.color = new Vector3f(0, 1, 0);
-            vectorHandle2 = VectorHandler.addVector(v2);
-        } else {
-            VectorHandler.changeVector(vectorHandle1, visualizedVector, acceleration);
-            VectorHandler.changeVector(vectorHandle2, visualizedVector, speed);
-        }
-        vectorHandles[0] = vectorHandle1;
-        vectorHandles[1] = vectorHandle2;
-    }
-
-
 }

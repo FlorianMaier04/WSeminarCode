@@ -24,8 +24,6 @@ public interface SimulationSystem {
      */
     public Vector3f getTargetCameraPosition();
 
-    public boolean displayVectors();
-
     public double getSecondsPerFrame();
 
     public void initContent();

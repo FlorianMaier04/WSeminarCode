@@ -6,17 +6,15 @@ import logic.objects.EquatorialCoordinateSystem;
 import logic.objects.PhysikObjekt;
 import logic.objects.vectors.RenderedVector;
 import logic.objects.vectors.VectorHandler;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.util.vector.Vector3f;
-import rendering.Scene;
-import tools.Keyboard;
+
+import java.util.HashMap;
 
 import static tools.FeedbackBuilder.*;
 
 public class RealisticSunSystem implements SimulationSystem {
 
-    int printCounter = 0;
-    private final double secondsPerFrame = 8000 / 50;
+    private final double secondsPerFrame = 8000 / 250;
 
     private PhysikObjekt sonne;
     private PhysikObjekt erde;
@@ -28,17 +26,17 @@ public class RealisticSunSystem implements SimulationSystem {
     private PhysikObjekt uranus;
     private PhysikObjekt neptun;
 
-    public boolean displayVectors = false;
+    private final float scaleFactor = 2f;
+    private final double massSizeFactor = scaleFactor * Math.pow(10, -4);
 
-    private PhysicThread pt;
-
-    private final float scaleFactor = 5f;
-
-    boolean standardBegin = false;
+    boolean standardBegin = true;
 
     private final String[] debuggedPlanets = new String[] {"sonne"};
     private final int[] debuggedValues = new int[] {ACCELLERATION,
             SPEED, POSITION};
+
+    // enthält jeweils den Planetennamen als Key und dann als Wert eine Array der Form [d1,d2,dt]
+    private final HashMap<String, double[]> distanceMap = new HashMap();
 
     @Override
     public void initContent() {
@@ -58,20 +56,19 @@ public class RealisticSunSystem implements SimulationSystem {
 
         //Sonne
         sonne = new PhysikObjekt(0, 0, 0);
-        sonne.initPhysics(0, 0, 0, 1.9891 * Math.pow(10, 30));
+        sonne.setSpeed(0,0,0);
+        sonne.mass = 1.9891 * Math.pow(10, 30);
         sonne.fixedColor = new Vector3f(5250, 5250, 5250);
         sonne.name = "sonne";
-        sonne.scale = 4 * scaleFactor;
+        sonne.scale = 10 * scaleFactor;
 
-        if(PhysicThread.windowStart || true) {
-            addMars();
-            addVenus();
-            addSaturn();
-            addJupiter();
-            addMerkur();
-            addUranus();
-            addNeptun();
-        }
+        addMars();
+        addVenus();
+        addSaturn();
+        addJupiter();
+        addMerkur();
+        addUranus();
+        addNeptun();
 
         //3d Koordinatensystem
         VectorHandler.addVector(new RenderedVector(new Vector3f(0,0,0), new Vector3f(1,0,0), 1000).withColor(1,0,0));
@@ -80,6 +77,11 @@ public class RealisticSunSystem implements SimulationSystem {
     }
 
     private void addMerkur() {
+        double d0 = aeToM(0.45153d);
+        double d1 = aeToM(0.45165d);
+        double dt = PhysicsEngine.secondsPerHour;
+        distanceMap.put("merkur",new double[]{d0,d1,dt});
+
         double[] rektaszension = new double[]{22, 24, 5.64}; // zum Datum
         double declination = computeDegree(-9,57,57.1); // zum Datum
         EquatorialCoordinateSystem.EquatorialCoordinate coordinate;
@@ -90,6 +92,11 @@ public class RealisticSunSystem implements SimulationSystem {
     }
 
     private void addVenus() {
+        double d0 = aeToM(0.72825d);
+        double d1 = aeToM(0.72826d);
+        double dt = PhysicsEngine.secondsPerHour * 8;
+        distanceMap.put("venus",new double[]{d0,d1,dt});
+
         double[] rektaszension = new double[]{22, 41, 59.37}; // zum Datum
         double declination = computeDegree(-9,34,44.4); // zum Datum
         EquatorialCoordinateSystem.EquatorialCoordinate coordinate;
@@ -100,62 +107,87 @@ public class RealisticSunSystem implements SimulationSystem {
     }
 
     private void addMars() {
+        double d0 = aeToM(1.46465d);
+        double d1 = aeToM(1.46470d);
+        double dt = PhysicsEngine.secondsPerHour;
+        distanceMap.put("mars",new double[]{d0,d1,dt});
+
         double[] rektaszension = new double[]{1, 43, 55.31}; // zum Datum
         double declination = computeDegree(10, 41, 6.9); // zum Datum
         EquatorialCoordinateSystem.EquatorialCoordinate coordinate;
         coordinate = new EquatorialCoordinateSystem.EquatorialCoordinate(rektaszension, declination);
-        coordinate.withDistance(aeToM(1.46465d));
+        coordinate.withDistance(d0);
         mars = createPlanet(coordinate, 6.417 * Math.pow(10, 23), -25082,
                 new Vector3f(204, 102, 0), "mars", 21344,1.9);
     }
 
     private void addSaturn() {
+        double d0 = aeToM(9.16659d);
+        double d1 = aeToM(9.16658d);
+        double dt = PhysicsEngine.secondsPerHour * 2;
+        distanceMap.put("saturn",new double[]{d0,d1,dt});
+
         double[] rektaszension = new double[]{2, 49, 35.59}; // zum Datum
         double declination = computeDegree(14,06,01.5);    // zum Datum
         EquatorialCoordinateSystem.EquatorialCoordinate coordinate;
         coordinate = new EquatorialCoordinateSystem.EquatorialCoordinate(rektaszension, declination);
-        coordinate.withDistance(aeToM(9.85299d));
+        coordinate.withDistance(d0);
         saturn = createPlanet(coordinate, 5.683 * Math.pow(10, 26), -10049,
                 new Vector3f(204,153,51), "saturn", 378675,2.5);
     }
 
     private void addJupiter() {
+        double d0 = aeToM(4.97700);
+        double d1 = aeToM(4.97701);
+        double dt = PhysicsEngine.secondsPerHour;
+        distanceMap.put("jupiter",new double[]{d0,d1,dt});
+
         double[] rektaszension = new double[]{2, 18, 19.60}; // zum Datum
         double declination = computeDegree(12,49,7.8); // zum Datum
         EquatorialCoordinateSystem.EquatorialCoordinate coordinate;
         coordinate = new EquatorialCoordinateSystem.EquatorialCoordinate(rektaszension, declination);
-        coordinate.withDistance(aeToM(4.97700));
+        coordinate.withDistance(d0);
         jupiter = createPlanet(coordinate, 1.898 * Math.pow(10, 27), -13645,
                 new Vector3f(250,225,167), "jupiter", 439264,1.3);
     }
 
     private void addUranus() {
+        double d0 = aeToM(19.93296);
+        double d1 = aeToM(19.93297);
+        double dt = PhysicsEngine.secondsPerHour * 2;
+        distanceMap.put("uranus",new double[]{d0,d1,dt});
+
         double[] rektaszension = new double[]{21, 27, 6.95}; // zum Datum
         double declination = computeDegree(-15,42,54.4); // zum Datum
         EquatorialCoordinateSystem.EquatorialCoordinate coordinate;
         coordinate = new EquatorialCoordinateSystem.EquatorialCoordinate(rektaszension, declination);
-        coordinate.withDistance(aeToM(19.93296));
+        coordinate.withDistance(d0);
         uranus = createPlanet(coordinate, 8.681 * Math.pow(10, 25), -6547,
                 new Vector3f(85, 217, 238),"uranus", 160590,0.8);
     }
 
     private void addNeptun() {
+        double d0 = aeToM(30.12019);
+        double d1 = aeToM(30.12018);
+        double dt = PhysicsEngine.secondsPerHour * 22;
+        distanceMap.put("neptun",new double[]{d0,d1,dt});
+
         double[] rektaszension = new double[]{20, 32, 58.01}; // zum Datum
         double declination = computeDegree(-18,34,23.3); // zum Datum
         EquatorialCoordinateSystem.EquatorialCoordinate coordinate;
         coordinate = new EquatorialCoordinateSystem.EquatorialCoordinate(rektaszension, declination);
-        coordinate.withDistance(aeToM(30.12019));
+        coordinate.withDistance(d0);
         neptun = createPlanet(coordinate, 1.024 * Math.pow(10, 26), -5425,
                 new Vector3f(49, 65, 248),"neptun", 155600,1.8);
     }
-
-    private final double massSizeFactor = 5 * Math.pow(10, -4);
 
     private PhysikObjekt createPlanet(EquatorialCoordinateSystem.EquatorialCoordinate coordinate, double mass,
                                       double speed, Vector3f color, String name, double radius, double ekliptikWinkelGrad) {
         PhysikObjekt result;
         result = PhysikObjekt.initialisiereObjektMitAequatorkoordinate(coordinate, erde, sonne);
-        result.initPhysics(speed, mass, sonne, ekliptikWinkelGrad);
+        double[] dArray = distanceMap.get(name);
+        result.berechneGeschwindigkeit(speed, sonne, ekliptikWinkelGrad,dArray[0], dArray[1], dArray[2]);
+        result.mass = mass;
         result.fixedColor = color;
         result.name = name;
         result.scale = (float)(radius * massSizeFactor);
@@ -179,31 +211,17 @@ public class RealisticSunSystem implements SimulationSystem {
         return m / meterPerAe;
     }
 
-    private int yearCounter = 0;
-
-    private double lastYearTime = 0;
-
-    private double lastEarthY = 0;
-
-    private double lastDiff = 0;
-
     @Override
     public void update() {
     }
 
     @Override
     public void initPhysicThread(PhysicThread pt) {
-        this.pt = pt;
     }
 
     @Override
     public PhysikObjekt getEarth() {
         return erde;
-    }
-
-    @Override
-    public boolean displayVectors() {
-        return displayVectors;
     }
 
     @Override

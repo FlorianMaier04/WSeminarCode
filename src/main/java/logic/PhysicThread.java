@@ -14,11 +14,6 @@ public class PhysicThread extends Thread {
 
     public boolean running = true;
 
-    //time messuring:
-
-    private long lastTime = 0;
-    private long timePerUpdate = 0;    //is set every second new in milliseconds
-
     public static final SimulationSystem activeSystem = new RealisticSunSystem();
 
     public static String writtenPlanet = null;
@@ -36,13 +31,12 @@ public class PhysicThread extends Thread {
     private void initContent() {
         activeSystem.initPhysicThread(this);
         PhysicsEngine.setSecondsPerFrame(activeSystem.getSecondsPerFrame());
-        PhysikObjekt.displayVector = activeSystem.displayVectors();
         activeSystem.initContent();
     }
 
     public boolean runPhysicsSimulation = false;
 
-    public static final boolean windowStart = false;
+    public static final boolean windowStart = true;
 
     @Override
     public void run() {

@@ -22,12 +22,6 @@ public class PhysikObjekt {
     public Vector3d speed = new Vector3d(0, 0, 0);
     public double mass = 0;
 
-    //used for showing debugging-info
-    public static boolean displayVector = false;
-
-    private static int visualizationIdCounter = 0;
-    private int visualizationId;
-
     public Vector3f fixedColor = null;
 
     public String name = null;
@@ -39,7 +33,6 @@ public class PhysikObjekt {
         EquatorialCoordinateSystem system = new EquatorialCoordinateSystem(earth, sun);
         Vector3d coordinate = equatorialCoordinate.computeCoordinatePosition(system);
 
-        System.out.println("coordinate: " + coordinate);
         PhysikObjekt object = new PhysikObjekt(coordinate.x , coordinate.y, coordinate.z);
 
         return object;
@@ -48,13 +41,8 @@ public class PhysikObjekt {
     public PhysikObjekt(double x, double y, double z) {
         pos = new Vector3d(x, y, z);
         PhysicsEngine.addPhysicsObject(this);
-        visualizationId = visualizationIdCounter;
-        visualizationIdCounter++;
     }
 
-    private int printCounter = 0;
-    private Boolean stopSunMovement = true;
-    private int sonnenVectorId = -1;
     public void update(List<PhysikObjekt> physikObjekts) {
         //results from all forces added
         Vector3d forceVector = new Vector3d(0, 0, 0);
@@ -70,91 +58,48 @@ public class PhysikObjekt {
         }
         acceleration = forceVector.divide(mass);
 
-//        if(name != null && name.equals("sonne") && !PhysicThread.windowStart) {
-//            if(sonnenVectorId == -1) {
-//                RenderedVector sonnenVector = new RenderedVector(pos,forceVector.normalize(), 10000)
-//                        .withColor(0,1,1);
-//                VectorHandler.addVector(sonnenVector);
-//                sonnenVectorId = sonnenVector.handleId;
-//                VectorHandler.addVector(
-//                        new RenderedVector(pos,speed.normalize(), 10000)
-//                                .withColor(0.5f,1, 0.5f)
-//                );
-//            }
-//            VectorHandler.changeVector(sonnenVectorId,pos, forceVector.normalize(),
-//                    (float)(forceVector.length() / Math.pow(10,20)));
-//            VectorHandler.changeVector(sonnenVectorId + 1,pos, speed.normalize(),
-//                    (float)(speed.length() * Math.pow(10,4)));
-//            printCounter++;
-//            if(printCounter > 3000) {
-//                stopSunMovement = false;
-////                System.out.println("force: "+forceVector+" speed: " + speed + " acceleration: " + acceleration);
-//                printCounter = 0;
-//            }
-//        }
-
-        Scene.handleVector(acceleration, speed, pos, displayVector, visualizationId);
-
         double timePassed = PhysicsEngine.secondsPerFrame;
         speed = speed.add(acceleration.scale(timePassed));
         pos = pos.add(speed.scale(timePassed));
     }
 
-    /**
-     * normalises an one dimensional vector
-     */
-    private int normaliseNumber(double number) {
-        return (int)(number / Math.abs(number));
-    }
-
-    public void initPhysics(double sx, double sy, double sz, double mass) {
-        setSpeed(sx, sy, sz);
-        this.mass = mass;
-    }
-
     public void berechneGeschwindigkeit(double d0, double d1, double dt, double betragV) {
         double v3 = 0;
-        double q = -0.5 * (Math.pow(d1, 2) - Math.pow(d0, 2) - Math.pow(betragV, 2));
 
         double cosAlpha = (Math.pow(d1, 2) - Math.pow(d0, 2) - Math.pow(betragV * dt, 2)) / (-2 * d0 * betragV * dt);
 
         double v2 = betragV - betragV * cosAlpha;
         double v1 = betragV * cosAlpha;
-
-//        System.out.println("cosApha: " + cosAlpha);
-//
-//
-//        double v1, v2;
-//        double positionTimeFactor = 2 * pos.x * dt;
-//        if(positionTimeFactor == 0) {
-//            v1 = 0.0;
-//        } else
-//            v1 = q / (2 * pos.x * dt);
-//
-//        positionTimeFactor = 2 * pos.y * dt;
-//        if(positionTimeFactor == 0) {
-//            v2 = 0.0;
-//        } else
-//            v2 = q / positionTimeFactor;
-
-
-        setSpeed(v1, v2, v3);
+        setSpeed(v1, -v2, v3);
     }
 
-    public void initPhysics(double speedAmount, double mass, @org.jetbrains.annotations.NotNull PhysikObjekt sun, double ekliptikWinkelGrad) {
-        Vector3d sunVector = pos.sub(sun.pos);
+    public void berechneGeschwindigkeit(double betragV, @org.jetbrains.annotations.NotNull PhysikObjekt sonne, double ekliptikWinkelGrad, double d0, double d1, double dt) {
+        Vector3d sonnenVektor = pos.sub(sonne.pos);
 
         double ekliptikWinkel = (ekliptikWinkelGrad / 360) * 2 * Math.PI;
-        Matrix3d rotationMatrixX = Maths.createRotationMatrixX(ekliptikWinkel);
+        Matrix3d rotationsMatrixX = Maths.createRotationMatrixX(ekliptikWinkel);
 
-        double x3 = 0;
-        double x2 = speedAmount / Math.sqrt((Math.pow(sunVector.y,2)/Math.pow(sunVector.x,2)+1));
-        double x1 = -(sunVector.y * x2) / sunVector.x;
+        double cosAlpha = (Math.pow(d1, 2) - Math.pow(d0, 2) - Math.pow(betragV * dt, 2)) / (-2 * d0 * betragV * dt);
+        double alpha = Math.acos(cosAlpha);
+        double alphaDegree = (alpha / (2 * Math.PI)) * 360;
+        Matrix3d rotationsMatrixZ = Maths.createRotationMatrixZ(alpha);
 
-        initPhysics(x1,x2,x3,mass);
+        Vector3d rotatedSonnenVektor = rotationsMatrixZ.multiply(sonnenVektor);
+        rotatedSonnenVektor = rotationsMatrixX.multiply(rotatedSonnenVektor);
+//        double v1 = 0;
+//        double v2 = betragV / Math.sqrt((Math.pow(sonnenVektor.y,2)/Math.pow(sonnenVektor.x,2)+1));
+//        double v3 = -(sonnenVektor.y * v2) / sonnenVektor.x;
+
+//        Vector3d v = new Vector3d(v1,v2,v3);
+//        Vector3d gedrehterVector = rotationsMatrixX.multiply(v);
+
+        setSpeed(rotatedSonnenVektor.normalize().scale(betragV));
     }
 
     public void setSpeed(double sx, double sy, double sz) {
         speed = new Vector3d(sx, sy, sz);
+    }
+    public void setSpeed(Vector3d v) {
+        speed = new Vector3d(v.x,v.y,v.z);
     }
 }
