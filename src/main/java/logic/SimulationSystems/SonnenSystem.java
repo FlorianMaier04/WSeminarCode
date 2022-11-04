@@ -1,7 +1,6 @@
 package logic.SimulationSystems;
 
 import logic.PhysicThread;
-import logic.PhysicsEngine;
 import logic.objects.EquatorialCoordinateSystem;
 import logic.objects.PhysikObjekt;
 import logic.objects.vectors.RenderedVector;
@@ -12,12 +11,10 @@ import java.util.HashMap;
 
 import static tools.FeedbackBuilder.*;
 
-public class RealisticSunSystem implements SimulationSystem {
+public class SonnenSystem implements SimulationSystem {
 
-    private final double secondsPerFrame = 8000 / 250;
-
-    private PhysikObjekt sonne;
-    private PhysikObjekt erde;
+    public PhysikObjekt sonne;
+    public PhysikObjekt erde;
     private PhysikObjekt mars;
     private PhysikObjekt saturn;
     private PhysikObjekt jupiter;
@@ -41,17 +38,6 @@ public class RealisticSunSystem implements SimulationSystem {
     public void initContent() {
         //Datum: 20.3.2000 7:34:16
         //JD: 2451623,77380ss
-        //Erde
-        double d0 = aeToM(0.99595);
-        double d1 = aeToM(0.99596);
-        double dt = PhysicsEngine.secondsPerHour;
-        double betragV = 29915;
-        erde = new PhysikObjekt(d0, 0, 0);
-        erde.mass = 5.9742 * Math.pow(10, 24);
-        erde.fixedColor = new Vector3f(0, 191, 255);
-        erde.scale = 2f * scaleFactor;
-        erde.berechneGeschwindigkeit(d0, d1, dt, betragV);
-        erde.name = "erde";
 
         //Sonne
         sonne = new PhysikObjekt(0, 0, 0);
@@ -60,6 +46,18 @@ public class RealisticSunSystem implements SimulationSystem {
         sonne.fixedColor = new Vector3f(5250, 5250, 5250);
         sonne.name = "sonne";
         sonne.scale = 10 * scaleFactor;
+
+        //Erde
+        double d0 = aeToM(0.99595);
+        double d1 = aeToM(0.99596);
+        double dt = PhysicThread.secondsPerHour;
+        double betragV = 29915;
+        erde = new PhysikObjekt(d0, 0, 0);
+        erde.mass = 5.9742 * Math.pow(10, 24);
+        erde.fixedColor = new Vector3f(0, 191, 255);
+        erde.scale = 2f * scaleFactor;
+        erde.berechneGeschwindigkeit(d0, d1, dt, betragV, sonne);
+        erde.name = "erde";
 
         addMars();
         addVenus();
@@ -78,7 +76,7 @@ public class RealisticSunSystem implements SimulationSystem {
     private void addMerkur() {
         double d0 = aeToM(0.45153d);
         double d1 = aeToM(0.45165d);
-        double dt = PhysicsEngine.secondsPerHour;
+        double dt = PhysicThread.secondsPerHour;
         distanceMap.put("merkur",new double[]{d0,d1,dt});
 
         double[] rektaszension = new double[]{22, 24, 5.64}; // zum Datum
@@ -93,7 +91,7 @@ public class RealisticSunSystem implements SimulationSystem {
     private void addVenus() {
         double d0 = aeToM(0.72825d);
         double d1 = aeToM(0.72826d);
-        double dt = PhysicsEngine.secondsPerHour * 8;
+        double dt = PhysicThread.secondsPerHour * 8;
         distanceMap.put("venus",new double[]{d0,d1,dt});
 
         double[] rektaszension = new double[]{22, 41, 59.37}; // zum Datum
@@ -108,7 +106,7 @@ public class RealisticSunSystem implements SimulationSystem {
     private void addMars() {
         double d0 = aeToM(1.46465d);
         double d1 = aeToM(1.46470d);
-        double dt = PhysicsEngine.secondsPerHour;
+        double dt = PhysicThread.secondsPerHour;
         distanceMap.put("mars",new double[]{d0,d1,dt});
 
         double[] rektaszension = new double[]{1, 43, 55.31}; // zum Datum
@@ -123,7 +121,7 @@ public class RealisticSunSystem implements SimulationSystem {
     private void addSaturn() {
         double d0 = aeToM(9.16659d);
         double d1 = aeToM(9.16658d);
-        double dt = PhysicsEngine.secondsPerHour * 2;
+        double dt = PhysicThread.secondsPerHour * 2;
         distanceMap.put("saturn",new double[]{d0,d1,dt});
 
         double[] rektaszension = new double[]{2, 49, 35.59}; // zum Datum
@@ -138,7 +136,7 @@ public class RealisticSunSystem implements SimulationSystem {
     private void addJupiter() {
         double d0 = aeToM(4.97700);
         double d1 = aeToM(4.97701);
-        double dt = PhysicsEngine.secondsPerHour;
+        double dt = PhysicThread.secondsPerHour;
         distanceMap.put("jupiter",new double[]{d0,d1,dt});
 
         double[] rektaszension = new double[]{2, 18, 19.60}; // zum Datum
@@ -153,7 +151,7 @@ public class RealisticSunSystem implements SimulationSystem {
     private void addUranus() {
         double d0 = aeToM(19.93296);
         double d1 = aeToM(19.93297);
-        double dt = PhysicsEngine.secondsPerHour * 2;
+        double dt = PhysicThread.secondsPerHour * 2;
         distanceMap.put("uranus",new double[]{d0,d1,dt});
 
         double[] rektaszension = new double[]{21, 27, 6.95}; // zum Datum
@@ -168,7 +166,7 @@ public class RealisticSunSystem implements SimulationSystem {
     private void addNeptun() {
         double d0 = aeToM(30.12019);
         double d1 = aeToM(30.12018);
-        double dt = PhysicsEngine.secondsPerHour * 22;
+        double dt = PhysicThread.secondsPerHour * 22;
         distanceMap.put("neptun",new double[]{d0,d1,dt});
 
         double[] rektaszension = new double[]{20, 32, 58.01}; // zum Datum
@@ -211,21 +209,12 @@ public class RealisticSunSystem implements SimulationSystem {
     }
 
     @Override
-    public void update() {
-    }
-
-    @Override
     public void initPhysicThread(PhysicThread pt) {
     }
 
     @Override
     public PhysikObjekt getEarth() {
         return erde;
-    }
-
-    @Override
-    public double getSecondsPerFrame() {
-        return secondsPerFrame;
     }
 
     @Override

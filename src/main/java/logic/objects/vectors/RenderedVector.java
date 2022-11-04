@@ -1,6 +1,5 @@
 package logic.objects.vectors;
 
-import logic.PhysicsEngine;
 import org.lwjgl.util.vector.Vector3f;
 import rendering.Scene;
 import tools.dataStructures.Vector3d;

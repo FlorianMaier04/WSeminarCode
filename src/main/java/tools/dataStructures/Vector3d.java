@@ -38,7 +38,7 @@ public class Vector3d {
         return result;
     }
 
-    public Vector3d scale(double scale) {
+    public Vector3d mulitply(double scale) {
         return new Vector3d(x * scale, y * scale, z * scale);
     }
 

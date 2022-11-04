@@ -1,8 +1,8 @@
 package rendering.input;
 
 import logic.PhysicThread;
-import logic.PhysicsEngine;
 import logic.objects.PhysikObjekt;
+import tools.FeedbackBuilder;
 
 import javax.swing.*;
 import java.awt.event.*;
@@ -97,8 +97,8 @@ public class InputFrame extends JFrame {
 
     private void startSimulation(PhysicThread pt) {
         pt.runPhysicsSimulation = true;
-        PhysicThread.writtenPlanet = currentSelectedPlanet;
-        PhysicThread.writtenPlanetFileName = currentSelectedPlanet + yearSpinner.getValue();
+        FeedbackBuilder.writtenPlanet = currentSelectedPlanet;
+        FeedbackBuilder.writtenPlanetFileName = currentSelectedPlanet + yearSpinner.getValue();
         setVisible(false);
     }
 
@@ -165,7 +165,7 @@ public class InputFrame extends JFrame {
     private void initPlanets() {
         int marsIndex = -1;
         int index = 0;
-        for(PhysikObjekt o: PhysicsEngine.physikObjekte) {
+        for(PhysikObjekt o: PhysicThread.physikObjekte) {
             planetDropdown.addItem(o.name);
             if(o.name.equals("mars"))
                 planetDropdown.setSelectedItem(o.name);

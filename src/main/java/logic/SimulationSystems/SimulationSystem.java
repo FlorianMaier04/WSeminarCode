@@ -24,11 +24,7 @@ public interface SimulationSystem {
      */
     public Vector3f getTargetCameraPosition();
 
-    public double getSecondsPerFrame();
-
     public void initContent();
-
-    public void update();
 
     public void initPhysicThread(PhysicThread pt);
 

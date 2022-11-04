@@ -1,7 +1,6 @@
 package rendering;
 
 import logic.PhysicThread;
-import logic.PhysicsEngine;
 import logic.objects.PhysikObjekt;
 import logic.objects.RenderObject;
 import logic.objects.vectors.VectorHandler;
@@ -75,11 +74,11 @@ public class Scene {
 
 
     private void loadPhysicsData() {
-        for (int i = 0; i < PhysicsEngine.physikObjekte.size(); i++) {
+        for (int i = 0; i < PhysicThread.physikObjekte.size(); i++) {
             RenderObject o = null;
             boolean objectPresent = i < objects.size();
             if (objectPresent) o = objects.get(i);
-            RenderObject newObject = convertPhysicToRenderObject(PhysicsEngine.physikObjekte.get(i), o);
+            RenderObject newObject = convertPhysicToRenderObject(PhysicThread.physikObjekte.get(i), o);
             if (objectPresent) objects.set(i, newObject);
             else objects.add(newObject);
         }

@@ -60,7 +60,7 @@ public class EquatorialCoordinateSystem {
 
             Vector3d rotatedVector = rotationMatrixZ.multiply(system.earthSunVector);
             rotatedVector = rotationMatrixY.multiply(rotatedVector);
-            return rotatedVector.scale(distance);
+            return rotatedVector.mulitply(distance);
         }
     }
 

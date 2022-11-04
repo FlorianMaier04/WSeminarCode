@@ -1,9 +1,5 @@
 package tools.dataStructures;
 
-import org.lwjgl.util.vector.Vector3f;
-
-import java.util.Arrays;
-
 public class Matrix3d {
 
 
@@ -14,9 +10,9 @@ public class Matrix3d {
         Vector3d s0 = getSpalte(0);
         Vector3d s1 = getSpalte(1);
         Vector3d s2 = getSpalte(2);
-        s0 = s0.scale(v.x);
-        s1 = s1.scale(v.y);
-        s2 = s2.scale(v.z);
+        s0 = s0.mulitply(v.x);
+        s1 = s1.mulitply(v.y);
+        s2 = s2.mulitply(v.z);
         Vector3d result = (s0.add(s1)).add(s2);
         return result;
     }

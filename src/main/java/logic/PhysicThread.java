@@ -1,42 +1,50 @@
 package logic;
 
-import logic.SimulationSystems.RealisticSunSystem;
-import logic.SimulationSystems.SimulationSystem;
+import logic.SimulationSystems.SonnenSystem;
 import logic.objects.PhysikObjekt;
 import rendering.Scene;
 import rendering.input.InputFrame;
-import tools.FeedbackBuilder;
 import tools.Keyboard;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class PhysicThread extends Thread {
 
+    //Konstante Werte
+    public static final double G = 6.67384 * Math.pow(10, -11.0);
+    public static final double meterPerAE = 1.496 * Math.pow(10, 11);
+    public static final long secondsPerYear = Math.round(60 * 60 * 24 * 365 + 5 * 60 * 60 + 48 * 60 + 46);
+
+    public static final long startTimeSeconds = 953534056 + secondsPerYear * 1970; // Zeit die bis zu dem Frühlingspunkt 2000 vergangen ist (t0 meiner Simulation)
+    public static final double secondsPerHour = Math.pow(60.0, 2.0);
+
+
+    public static double timePassedYears() { return timePassed / (double) secondsPerYear; }
+    public static double timePassedRealYears() { return (timePassed + startTimeSeconds) / (double) secondsPerYear; }
+
+
+
+    public boolean runPhysicsSimulation = false;
+    public static final boolean windowStart = true;
+
     public boolean running = true;
 
-    public static final SimulationSystem activeSystem = new RealisticSunSystem();
+    public static final SonnenSystem activeSystem = new SonnenSystem();
 
-    public static String writtenPlanet = null;
-    public static String writtenPlanetFileName = "";
-    public static final String writtenPlanetFilePath = "GraphShower/res/";
-    public static int writeMode = FeedbackBuilder.X_COORDINATE;
-    public static long secondsPerWrite = PhysicsEngine.secondsPerYear / (16 * 16);
+    public static List<PhysikObjekt> physikObjekte = new ArrayList<>();
+
+    public static double deltaT = 8000 / 1000; // die Zeit, die in der Simulation ein Zeitschritt einnimmt in Sekunden
+    public static double timePassed = 0; // Zeit die seit Simulationsstart vergangen ist (T)
 
     @Override
     public synchronized void start() {
-        initContent();
+        activeSystem.initPhysicThread(this);
+        activeSystem.initContent();
         super.start();
     }
-
-    private void initContent() {
-        activeSystem.initPhysicThread(this);
-        PhysicsEngine.setSecondsPerFrame(activeSystem.getSecondsPerFrame());
-        activeSystem.initContent();
-    }
-
-    public boolean runPhysicsSimulation = false;
-
-    public static final boolean windowStart = false;
 
     @Override
     public void run() {
@@ -44,7 +52,6 @@ public class PhysicThread extends Thread {
             new InputFrame(this);
         while (running) {
             if (runPhysicsSimulation) {
-                activeSystem.update();
                 updatePhysics();
             } else {
                 if (Keyboard.isKeyPressed(GLFW_KEY_G)) {
@@ -65,6 +72,16 @@ public class PhysicThread extends Thread {
     }
 
     private void updatePhysics() {
-        PhysicsEngine.update();
+        for(int i = 0;i < physikObjekte.size(); i++) {
+            physikObjekte.get(i).update(physikObjekte);
+        }
+        for(int i = 0;i < physikObjekte.size(); i++) {
+            physikObjekte.get(i).commitNewPos();
+        }
+        updateTime();
+    }
+
+    private static void updateTime() {
+        timePassed = timePassed + deltaT;
     }
 }
