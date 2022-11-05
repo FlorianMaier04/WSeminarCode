@@ -6,6 +6,7 @@ import logic.objects.PhysikObjekt;
 import logic.objects.vectors.RenderedVector;
 import logic.objects.vectors.VectorHandler;
 import org.lwjgl.util.vector.Vector3f;
+import tools.dataStructures.Vector3d;
 
 import java.util.HashMap;
 
@@ -26,7 +27,7 @@ public class SonnenSystem implements SimulationSystem {
     private final float scaleFactor = 2f;
     private final double massSizeFactor = scaleFactor * Math.pow(10, -4);
 
-    boolean standardBegin = true;
+    boolean standardBegin = false;
 
     private final String[] debuggedPlanets = new String[] {"sonne"};
     private final int[] debuggedValues = new int[] {SPEED, POSITION};
@@ -183,20 +184,30 @@ public class SonnenSystem implements SimulationSystem {
         PhysikObjekt result;
         result = PhysikObjekt.initialisiereObjektMitAequatorkoordinate(coordinate, erde, sonne);
         double[] dArray = distanceMap.get(name);
-        result.berechneGeschwindigkeit(speed, sonne, ekliptikWinkelGrad,dArray[0], dArray[1], dArray[2]);
+        result.name = name;
+        result.berechneGeschwindigkeit(speed, sonne, ekliptikWinkelGrad, dArray[0], dArray[1], dArray[2]);
         result.mass = mass;
         result.fixedColor = color;
-        result.name = name;
         result.scale = (float)(radius * massSizeFactor);
         return result;
     }
 
+    private double computeAlphaDegree(PhysikObjekt o) {
+        double y = o.pos.y;
+        double z = o.pos.z;
+        double alpha = Math.atan(y/z);
+        double alphaDegree = 90 + (alpha / (2 * Math.PI)) * 360;
+        return alpha;
+    }
+
     private double computeDegree(int degree, int minutes, double seconds) {
-        int degreeVorzeichen = degree / Math.abs(degree);
+        int degreeVorzeichen = 1;
+        if(degree != 0)
+            degreeVorzeichen = degree / Math.abs(degree);
 
         double sum = minutes * 60 * degreeVorzeichen + seconds * degreeVorzeichen;
         double totalSeconds = 60 * 60;
-        return Math.abs(degree + sum / totalSeconds);
+        return degree + sum / totalSeconds;
     }
 
     private final double meterPerAe = 1.495979 * Math.pow(10, 11);

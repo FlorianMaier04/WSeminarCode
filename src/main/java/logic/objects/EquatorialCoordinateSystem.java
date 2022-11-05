@@ -41,7 +41,6 @@ public class EquatorialCoordinateSystem {
             double sum = rektaszension[0] * secondsPerHour + rektaszension[1] * secondsPerMinute * rektaszensionVorzeichen + rektaszension[2] * rektaszensionVorzeichen;
             int total = 24 * secondsPerHour;
             computedRektaszension = sum / (double) total;
-            System.out.println("declination: "+declination);
             computedDeclination = (declination) / 360;
         }
 
@@ -51,15 +50,18 @@ public class EquatorialCoordinateSystem {
 
         public Vector3d computeCoordinatePosition(EquatorialCoordinateSystem system) {
             // Nordpol der Erde zeigt z-Achse -> Deklination ist z Position
-            double declinationAngle = (computedDeclination) * 2 * Math.PI;
+            double erdEkliptik = (23.5 / 360.0) * Math.PI;
+            double declinationAngle = (computedDeclination) * 2.0 * Math.PI;
+            declinationAngle = declinationAngle - (erdEkliptik * (declinationAngle / Math.abs(declinationAngle)));
             double rektaszensionAngle = computedRektaszension * 2.0 * Math.PI;
 
             Matrix3d rotationMatrixZ = Maths.createRotationMatrixZ(rektaszensionAngle);
-            Matrix3d rotationMatrixY = Maths.createRotationMatrixX(declinationAngle);
+            Matrix3d rotationMatrixX = Maths.createRotationMatrixY(declinationAngle);
 
+            Vector3d rotatedVector = system.earthSunVector;
+            rotatedVector = rotationMatrixZ.multiply(rotatedVector);
+            rotatedVector = rotationMatrixX.multiply(rotatedVector);
 
-            Vector3d rotatedVector = rotationMatrixZ.multiply(system.earthSunVector);
-            rotatedVector = rotationMatrixY.multiply(rotatedVector);
             return rotatedVector.mulitply(distance);
         }
     }

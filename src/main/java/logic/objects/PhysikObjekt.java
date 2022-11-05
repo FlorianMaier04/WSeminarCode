@@ -76,26 +76,20 @@ public class PhysikObjekt {
     }
 
     public void berechneGeschwindigkeit(double betragV, @org.jetbrains.annotations.NotNull PhysikObjekt sonne, double ekliptikWinkelGrad, double d0, double d1, double dt) {
-        Vector3d sonnenVektor = pos.sub(sonne.pos);
+        Vector3d sonnenVektor = pos.sub(sonne.pos).normalize().mulitply(betragV);
 
         double ekliptikWinkel = (ekliptikWinkelGrad / 360) * 2 * Math.PI;
-        Matrix3d rotationsMatrixX = Maths.createRotationMatrixX(ekliptikWinkel);
+        Matrix3d rotationsMatrixY = Maths.createRotationMatrixX(ekliptikWinkel);
 
         double cosAlpha = (Math.pow(d1, 2) - Math.pow(d0, 2) - Math.pow(betragV * dt, 2)) / (-2 * d0 * betragV * dt);
         double alpha = Math.acos(cosAlpha);
-        double alphaDegree = (alpha / (2 * Math.PI)) * 360;
+
         Matrix3d rotationsMatrixZ = Maths.createRotationMatrixZ(alpha);
 
         Vector3d rotatedSonnenVektor = rotationsMatrixZ.multiply(sonnenVektor);
-        rotatedSonnenVektor = rotationsMatrixX.multiply(rotatedSonnenVektor);
-//        double v1 = 0;
-//        double v2 = betragV / Math.sqrt((Math.pow(sonnenVektor.y,2)/Math.pow(sonnenVektor.x,2)+1));
-//        double v3 = -(sonnenVektor.y * v2) / sonnenVektor.x;
-
-//        Vector3d v = new Vector3d(v1,v2,v3);
-//        Vector3d gedrehterVector = rotationsMatrixX.multiply(v);
-
-        setSpeed(rotatedSonnenVektor.normalize().mulitply(betragV));
+        rotatedSonnenVektor = rotationsMatrixY.multiply(rotatedSonnenVektor);
+//        rotatedSonnenVektor = rotationsMatrixX.multiply(rotatedSonnenVektor);
+        setSpeed(rotatedSonnenVektor);
     }
 
     public void setSpeed(double sx, double sy, double sz) {

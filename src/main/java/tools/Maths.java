@@ -42,6 +42,22 @@ public class Maths {
         return matrix;
     }
 
+    public static Matrix3d createRotationMatrixY(double r2) {
+        Matrix3d matrix = new Matrix3d();
+        matrix.values[0][0] = Math.cos(r2);
+        matrix.values[0][1] = 0;
+        matrix.values[0][2] = Math.sin(r2);
+
+        matrix.values[1][0] = 0;
+        matrix.values[1][1] = 1;
+        matrix.values[1][2] = 0;
+
+        matrix.values[2][0] = -Math.sin(r2);
+        matrix.values[2][1] = 0;
+        matrix.values[2][2] = Math.cos(r2);
+        return matrix;
+    }
+
     public static Matrix4f createTransformationMatrix(Vector3f translation, Vector3f rotation, float scale) {
         Matrix4f matrix = new Matrix4f();
         matrix.setIdentity();

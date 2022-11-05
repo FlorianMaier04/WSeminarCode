@@ -87,52 +87,56 @@ public class FeedbackBuilder {
 
     private final String newLine = System.lineSeparator();
 
+    private final String trennzeichen = ",";
+
     private void writeFileData(PhysikObjekt po) {
         switch(writeMode) {
             case DISTANCE_TO_EARTH:
                 double distance = po.pos.sub(PhysicThread.activeSystem.getEarth().pos).length() / PhysicThread.meterPerAE;
-                xLine += PhysicThread.timePassedRealYears() + ",";
-                yLine += distance + ",";
+                xLine += PhysicThread.timePassedRealYears() + trennzeichen;
+                yLine += distance + trennzeichen;
                 break;
             case Y_COORDINATE:
                 double y = po.pos.y / PhysicThread.meterPerAE;
                 y = Math.abs(y);
-                xLine += PhysicThread.timePassedRealYears() + ",";
-                yLine += y + ",";
+                xLine += PhysicThread.timePassedRealYears() + trennzeichen;
+                yLine += y + trennzeichen;
                 break;
             case X_COORDINATE:
                 double x = po.pos.x / PhysicThread.meterPerAE;
                 x = Math.abs(x);
-                xLine += PhysicThread.timePassedRealYears() + ",";
-                yLine += x + ",";                break;
+                xLine += PhysicThread.timePassedRealYears() + trennzeichen;
+                yLine += x + trennzeichen;
+                break;
             case Z_COORDINATE:
                 double z = po.pos.z / PhysicThread.meterPerAE;
                 z = Math.abs(z);
-                xLine += PhysicThread.timePassedRealYears() + ",";
-                yLine += z + ",";
+                xLine += PhysicThread.timePassedRealYears() + trennzeichen;
+                yLine += z + trennzeichen;
                 break;
             case Y_COORDINATE_SUN:
                 y = po.pos.y / PhysicThread.meterPerAE;
                 y = Math.abs(y);
-                xLine += PhysicThread.timePassedRealYears() + ",";
-                yLine += y + ",";
+                xLine += PhysicThread.timePassedRealYears() + trennzeichen;
+                yLine += y + trennzeichen;
                 break;
             case X_COORDINATE_SUN:
                 x = (po.pos.sub(PhysicThread.activeSystem.getEarth().pos).x) / PhysicThread.meterPerAE;
                 x = Math.abs(x);
-                xLine += PhysicThread.timePassedRealYears() + ",";
-                yLine += x + ",";                break;
+                xLine += PhysicThread.timePassedRealYears() + trennzeichen;
+                yLine += x + trennzeichen;
+                break;
             case Z_COORDINATE_SUN:
                 z = po.pos.z / PhysicThread.meterPerAE;
                 z = Math.abs(z);
-                xLine += PhysicThread.timePassedRealYears() + ",";
-                yLine += z + ",";
+                xLine += PhysicThread.timePassedRealYears() + trennzeichen;
+                yLine += z + trennzeichen;
                 break;
             case DISTANCE_TO_SUN:
                 Vector3d sunVector = po.pos.sub(PhysicThread.activeSystem.sonne.pos);
                 double length = sunVector.length();
-                xLine += PhysicThread.timePassedRealYears() + ",";
-                yLine += length + ",";
+                xLine += PhysicThread.timePassedRealYears() + trennzeichen;
+                yLine += length + trennzeichen;
         }
 
     }

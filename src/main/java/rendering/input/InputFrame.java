@@ -13,7 +13,7 @@ public class InputFrame extends JFrame {
     private JTextField dekField;
     private JTextField distanceField;
     private JButton startButton;
-    private JSpinner yearSpinner;
+    private JTextField nameField;
     private JComboBox<String> planetDropdown;
 
     private String currentSelectedPlanet;
@@ -30,8 +30,9 @@ public class InputFrame extends JFrame {
         planetDropdown = new JComboBox();
         getContentPane().add(planetDropdown);
 
-        yearSpinner = new JSpinner();
-        getContentPane().add(yearSpinner);
+
+        nameField = new JTextField();
+        getContentPane().add(nameField);
 
         JPanel panel = new JPanel();
         getContentPane().add(panel);
@@ -98,7 +99,7 @@ public class InputFrame extends JFrame {
     private void startSimulation(PhysicThread pt) {
         pt.runPhysicsSimulation = true;
         FeedbackBuilder.writtenPlanet = currentSelectedPlanet;
-        FeedbackBuilder.writtenPlanetFileName = currentSelectedPlanet + yearSpinner.getValue();
+        FeedbackBuilder.writtenPlanetFileName = currentSelectedPlanet + nameField.getText();
         setVisible(false);
     }
 

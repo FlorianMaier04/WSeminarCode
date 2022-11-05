@@ -28,7 +28,7 @@ public class PhysicThread extends Thread {
 
 
     public boolean runPhysicsSimulation = false;
-    public static final boolean windowStart = true;
+    public static final boolean windowStart = false;
 
     public boolean running = true;
 

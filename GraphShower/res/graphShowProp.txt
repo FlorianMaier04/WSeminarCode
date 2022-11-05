@@ -1,2 +1,2 @@
 resFolder:res/
-fullSize:true
+fullSize:false
