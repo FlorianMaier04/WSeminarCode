@@ -1,5 +1,6 @@
 package logic.objects;
 
+import logic.SimulationSystems.SonnenSystem;
 import tools.Maths;
 import tools.dataStructures.Matrix3d;
 import tools.dataStructures.Vector3d;
@@ -48,18 +49,17 @@ public class EquatorialCoordinateSystem {
             this.distance = distance;
         }
 
-        public Vector3d computeCoordinatePosition(EquatorialCoordinateSystem system) {
-            // Nordpol der Erde zeigt z-Achse -> Deklination ist z Position
-            double erdEkliptik = (23.5 / 360.0) * Math.PI;
-            double declinationAngle = (computedDeclination) * 2.0 * Math.PI;
-            declinationAngle = declinationAngle - (erdEkliptik * (declinationAngle / Math.abs(declinationAngle)));
+        public Vector3d berechnePosition(EquatorialCoordinateSystem system) {
+            double declinationAngle = computedDeclination * 2.0 * Math.PI;
             double rektaszensionAngle = computedRektaszension * 2.0 * Math.PI;
 
             Matrix3d rotationMatrixZ = Maths.createRotationMatrixZ(rektaszensionAngle);
-            Matrix3d rotationMatrixX = Maths.createRotationMatrixY(declinationAngle);
+            Matrix3d rotationMatrixY = Maths.createRotationMatrixY(declinationAngle);
+            Matrix3d rotationMatrixX = Maths.createRotationMatrixX(SonnenSystem.schiefeDerEkliptik);
 
             Vector3d rotatedVector = system.earthSunVector;
             rotatedVector = rotationMatrixZ.multiply(rotatedVector);
+            rotatedVector = rotationMatrixY.multiply(rotatedVector);
             rotatedVector = rotationMatrixX.multiply(rotatedVector);
 
             return rotatedVector.mulitply(distance);

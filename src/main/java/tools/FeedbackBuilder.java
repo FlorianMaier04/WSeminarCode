@@ -25,10 +25,12 @@ public class FeedbackBuilder {
     public static final int Y_COORDINATE_SUN = 10;
     public static final int Z_COORDINATE_SUN = 11;
 
+    public static final int OPPOSITIONS_VEKTOREN = 12;
+
     public static String writtenPlanet = null;
     public static String writtenPlanetFileName = "";
     public static final String writtenPlanetFilePath = "GraphShower/res/";
-    public static int writeMode = FeedbackBuilder.DISTANCE_TO_SUN;
+    public static int writeMode = DISTANCE_TO_SUN;
     public static long secondsPerWrite = PhysicThread.secondsPerYear / (16 * 16);
 
     private static final String[] valueDescriptions = new String[]{"rec. Umlauf", "av. Umlauf", "pos", "v", "a"};
@@ -137,6 +139,14 @@ public class FeedbackBuilder {
                 double length = sunVector.length();
                 xLine += PhysicThread.timePassedRealYears() + trennzeichen;
                 yLine += length + trennzeichen;
+                break;
+            case OPPOSITIONS_VEKTOREN:
+                sunVector = po.pos.sub(PhysicThread.activeSystem.sonne.pos).normalize();
+                Vector3d earthVector = po.pos.sub(PhysicThread.activeSystem.erde.pos).normalize();
+                double scalar = earthVector.skalarProdukt(sunVector);
+                double phi = Math.acos(scalar / (earthVector.length() * sunVector.length()));
+                xLine += PhysicThread.timePassedRealYears() + trennzeichen;
+                yLine += phi + trennzeichen;
         }
 
     }

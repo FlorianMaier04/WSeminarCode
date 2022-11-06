@@ -98,3 +98,4 @@ app/release/output.json
 .gradle
 build
 hs_err_pid14480.log
+GraphShower/res/graphShowProp.txt

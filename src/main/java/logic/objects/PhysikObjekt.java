@@ -26,7 +26,7 @@ public class PhysikObjekt {
                                                                         PhysikObjekt earth, PhysikObjekt sun) {
         // einen normalisierten Vekotr errechnet, der von der Erde aus auf das zu erschaffende Objekt zeigt
         EquatorialCoordinateSystem system = new EquatorialCoordinateSystem(earth, sun);
-        Vector3d coordinate = equatorialCoordinate.computeCoordinatePosition(system);
+        Vector3d coordinate = equatorialCoordinate.berechnePosition(system).add(earth.pos);
 
         PhysikObjekt object = new PhysikObjekt(coordinate.x , coordinate.y, coordinate.z);
 
@@ -54,9 +54,8 @@ public class PhysikObjekt {
         }
         Vector3d a = f.divide(mass);
 
-        double timePassed = PhysicThread.deltaT;
-        speed = speed.add(a.mulitply(timePassed));
-        newPos = pos.add(speed.mulitply(timePassed));
+        speed = speed.add(a.mulitply(PhysicThread.deltaT));
+        newPos = pos.add(speed.mulitply(PhysicThread.deltaT));
     }
 
     public void commitNewPos() {
@@ -75,21 +74,18 @@ public class PhysikObjekt {
         setSpeed(erdeSonneVektor);
     }
 
-    public void berechneGeschwindigkeit(double betragV, @org.jetbrains.annotations.NotNull PhysikObjekt sonne, double ekliptikWinkelGrad, double d0, double d1, double dt) {
-        Vector3d sonnenVektor = pos.sub(sonne.pos).normalize().mulitply(betragV);
-
-        double ekliptikWinkel = (ekliptikWinkelGrad / 360) * 2 * Math.PI;
-        Matrix3d rotationsMatrixY = Maths.createRotationMatrixX(ekliptikWinkel);
+    public void berechneGeschwindigkeit(double d0, double d1, double dt, double betragV, double bahnebenenSchiefe, @org.jetbrains.annotations.NotNull PhysikObjekt sonne) {
+        Vector3d sonnenVektor = pos.sub(sonne.pos).normalize();
 
         double cosAlpha = (Math.pow(d1, 2) - Math.pow(d0, 2) - Math.pow(betragV * dt, 2)) / (-2 * d0 * betragV * dt);
         double alpha = Math.acos(cosAlpha);
 
+        Matrix3d rotationsMatrixX = Maths.createRotationMatrixX(bahnebenenSchiefe);
         Matrix3d rotationsMatrixZ = Maths.createRotationMatrixZ(alpha);
 
         Vector3d rotatedSonnenVektor = rotationsMatrixZ.multiply(sonnenVektor);
-        rotatedSonnenVektor = rotationsMatrixY.multiply(rotatedSonnenVektor);
-//        rotatedSonnenVektor = rotationsMatrixX.multiply(rotatedSonnenVektor);
-        setSpeed(rotatedSonnenVektor);
+        rotatedSonnenVektor = rotationsMatrixX.multiply(rotatedSonnenVektor);
+        setSpeed(rotatedSonnenVektor.mulitply(betragV));
     }
 
     public void setSpeed(double sx, double sy, double sz) {

@@ -83,4 +83,8 @@ public class Vector3d {
         double newZ = y * Math.sin(angle) + z * Math.cos(angle);
         return new Vector3d(x, newY, newZ);
     }
+
+    public double skalarProdukt(Vector3d sunVector) {
+        return x * sunVector.x + y * sunVector.y + z * sunVector.z;
+    }
 }

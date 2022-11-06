@@ -28,7 +28,7 @@ public class PhysicThread extends Thread {
 
 
     public boolean runPhysicsSimulation = false;
-    public static final boolean windowStart = false;
+    public static final boolean windowStart = true;
 
     public boolean running = true;
 
@@ -36,7 +36,7 @@ public class PhysicThread extends Thread {
 
     public static List<PhysikObjekt> physikObjekte = new ArrayList<>();
 
-    public static double deltaT = 8000 / 1000; // die Zeit, die in der Simulation ein Zeitschritt einnimmt in Sekunden
+    public static double deltaT = 8000 / 250; // die Zeit, die in der Simulation ein Zeitschritt einnimmt in Sekunden
     public static double timePassed = 0; // Zeit die seit Simulationsstart vergangen ist (T)
 
     @Override
@@ -81,7 +81,14 @@ public class PhysicThread extends Thread {
         updateTime();
     }
 
+//    private static double lastYearTime = 0;
+//    private static int yearCounter = 0;
     private static void updateTime() {
         timePassed = timePassed + deltaT;
+//        if(timePassed - lastYearTime > secondsPerYear) {
+//            yearCounter++;
+//            lastYearTime = timePassed;
+//            System.out.println("year: "+ yearCounter);
+//        }
     }
 }
