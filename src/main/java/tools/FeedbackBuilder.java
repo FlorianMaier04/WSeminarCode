@@ -35,15 +35,8 @@ public class FeedbackBuilder {
 
     private static final String[] valueDescriptions = new String[]{"rec. Umlauf", "av. Umlauf", "pos", "v", "a"};
 
-    private final int ticksPerBuild = 1;
-    private int tickCounter = ticksPerBuild;
-
     public void update() {
-        if (tickCounter >= ticksPerBuild) {
-            build();
-            tickCounter = 0;
-        } else
-            tickCounter++;
+        build();
     }
 
     private final long secondsPerUpdate = secondsPerWrite;

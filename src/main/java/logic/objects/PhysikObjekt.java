@@ -55,7 +55,7 @@ public class PhysikObjekt {
         Vector3d a = f.divide(mass);
 
         speed = speed.add(a.mulitply(PhysicThread.deltaT));
-        newPos = pos.add(speed.mulitply(PhysicThread.deltaT));
+        newPos = pos.add(speed.mulitply(PhysicThread.deltaT)); // pos kann hier noch nicht überschrieben werden -> newPos wird in commitNewPos auf pos angewendet
     }
 
     public void commitNewPos() {
