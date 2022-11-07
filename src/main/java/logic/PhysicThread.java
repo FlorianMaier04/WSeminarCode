@@ -28,7 +28,7 @@ public class PhysicThread extends Thread {
 
 
     public boolean runPhysicsSimulation = false;
-    public static final boolean windowStart = true;
+    public static final boolean windowStart = false;
 
     public boolean running = true;
 
@@ -36,28 +36,12 @@ public class PhysicThread extends Thread {
 
     public static List<PhysikObjekt> physikObjekte = new ArrayList<>();
 
-//    public static double deltaT = 1;
-//    public static double deltaT = 30 ; // die Zeit, die in der Simulation ein Zeitschritt einnimmt in Sekunden
-    public static double deltaT = 86400 * 10;
-//    public static double deltaT = 11000;
-//public static double deltaT = 9000;
-
-    //    public static double deltaT = 8000;
-//        public static double deltaT = 7500;
-//public static double deltaT = 7000;
-
-//    public static double deltaT = 6000;
-//    public static double deltaT = 4000;
-//    public static double deltaT = 2000;
-//    public static double deltaT = 1500;
-//    public static double deltaT = 500;
-//    public static double deltaT = 200;
+    public static double deltaT = 30 ; // die Zeit, die in der Simulation ein Zeitschritt einnimmt in Sekunden
 
     public static double timePassed = 0; // Zeit die seit Simulationsstart vergangen ist (T)
 
     @Override
     public synchronized void start() {
-        activeSystem.initPhysicThread(this);
         activeSystem.initContent();
         super.start();
     }
@@ -88,11 +72,6 @@ public class PhysicThread extends Thread {
     }
 
     private void updatePhysics() {
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         for(int i = 0;i < physikObjekte.size(); i++) {
             physikObjekte.get(i).update(physikObjekte);
         }
@@ -102,14 +81,7 @@ public class PhysicThread extends Thread {
         updateTime();
     }
 
-//    private static double lastYearTime = 0;
-//    private static int yearCounter = 0;
     private static void updateTime() {
         timePassed = timePassed + deltaT;
-//        if(timePassed - lastYearTime > secondsPerYear) {
-//            yearCounter++;
-//            lastYearTime = timePassed;
-//            System.out.println("year: "+ yearCounter);
-//        }
     }
 }

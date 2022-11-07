@@ -24,7 +24,6 @@ public class PhysikObjekt {
 
     public static PhysikObjekt initialisiereObjektMitAequatorkoordinate(EquatorialCoordinateSystem.EquatorialCoordinate equatorialCoordinate,
                                                                         PhysikObjekt earth, PhysikObjekt sun) {
-        // einen normalisierten Vekotr errechnet, der von der Erde aus auf das zu erschaffende Objekt zeigt
         EquatorialCoordinateSystem system = new EquatorialCoordinateSystem(earth, sun);
         Vector3d coordinate = equatorialCoordinate.berechnePosition(system).add(earth.pos);
 
@@ -62,7 +61,7 @@ public class PhysikObjekt {
         pos = newPos;
     }
 
-    public void berechneGeschwindigkeit(double d0, double d1, double dt, double betragV, PhysikObjekt sonne) {
+    public void berechneGeschwindigkeitErde(double d0, double d1, double dt, double betragV, PhysikObjekt sonne) {
         double cosAlpha = (Math.pow(d1, 2) - Math.pow(d0, 2) - Math.pow(betragV * dt, 2)) / (-2 * d0 * betragV * dt);
         double alpha = Math.acos(cosAlpha);
 

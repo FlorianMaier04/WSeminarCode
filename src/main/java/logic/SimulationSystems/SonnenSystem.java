@@ -3,6 +3,8 @@ package logic.SimulationSystems;
 import logic.PhysicThread;
 import logic.objects.EquatorialCoordinateSystem;
 import logic.objects.PhysikObjekt;
+import logic.objects.vectors.RenderedVector;
+import logic.objects.vectors.VectorHandler;
 import org.lwjgl.util.vector.Vector3f;
 
 import java.util.HashMap;
@@ -56,7 +58,7 @@ public class SonnenSystem implements SimulationSystem {
         erde.mass = 5.9742 * Math.pow(10, 24);
         erde.fixedColor = new Vector3f(0, 191, 255);
         erde.scale = 2f * scaleFactor;
-        erde.berechneGeschwindigkeit(d0, d1, dt, betragV, sonne);
+        erde.berechneGeschwindigkeitErde(d0, d1, dt, betragV, sonne);
         erde.name = "erde";
 
         addMars();
@@ -68,9 +70,9 @@ public class SonnenSystem implements SimulationSystem {
         addNeptun();
 
         //3d Koordinatensystem
-//        VectorHandler.addVector(new RenderedVector(new Vector3f(0,0,0), new Vector3f(1,0,0), 1000).withColor(1,0,0));
-//        VectorHandler.addVector(new RenderedVector(new Vector3f(0,0,0), new Vector3f(0,1,0), 1000).withColor(0,1,0));
-//        VectorHandler.addVector(new RenderedVector(new Vector3f(0,0,0), new Vector3f(0,0,1), 1000).withColor(0,0,1));
+        VectorHandler.addVector(new RenderedVector(new Vector3f(0,0,0), new Vector3f(1,0,0), 1000).withColor(1,0,0));
+        VectorHandler.addVector(new RenderedVector(new Vector3f(0,0,0), new Vector3f(0,1,0), 1000).withColor(0,1,0));
+        VectorHandler.addVector(new RenderedVector(new Vector3f(0,0,0), new Vector3f(0,0,1), 1000).withColor(0,0,1));
     }
 
     private void addMerkur() {
@@ -200,15 +202,6 @@ public class SonnenSystem implements SimulationSystem {
         return result;
     }
 
-    private double computeAlphaDegree(PhysikObjekt o) {
-        double y = o.pos.y;
-        double z = o.pos.z;
-        double alpha = Math.atan(y/z);
-        double alphaDegree = 90 + (alpha / (2 * Math.PI)) * 360;
-        System.out.println("alphaDegree " + o.name + ": " + alphaDegree);
-        return alpha;
-    }
-
     /**
      * rechnet den gegeben Winkel in eine Kommazahl um
      * Bsp. 23Grad 30 winkelminuten 0 winkelsekunden -> 23,5 Grad
@@ -230,25 +223,6 @@ public class SonnenSystem implements SimulationSystem {
     }
     private double mToAE(double m) {
         return m / meterPerAe;
-    }
-
-    @Override
-    public void initPhysicThread(PhysicThread pt) {
-    }
-
-    @Override
-    public PhysikObjekt getEarth() {
-        return erde;
-    }
-
-    @Override
-    public String[] getDebuggedPlanets() {
-        return debuggedPlanets;
-    }
-
-    @Override
-    public int[] getDebuggedValues() {
-        return debuggedValues;
     }
 
     @Override
